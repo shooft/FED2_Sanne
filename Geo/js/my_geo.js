@@ -2,10 +2,12 @@ var GEO = GEO || {};
    
 (function () {
 	
+	// Constants
 	var GPS_AVAILABLE = 'GPS_AVAILABLE';
 	var	GPS_UNAVAILABLE = 'GPS_UNAVAILABLE';
 	var	POSITION_UPDATED = 'POSITION_UPDATED';
 	
+	// The real stuff
 	var locaties = [
 		['Jan Bommerhuis', 'http://www.google.com', 30, 52.35981828737461, 4.909543130688462],
 		['Theo Thijssenhuis', 'http://icanhasgeo.nl/map.html#TTH', 50, 52.35955620231157, 4.908019635968003],
@@ -13,6 +15,8 @@ var GEO = GEO || {};
 		['Crea', 'http://icanhasgeo.nl/map.html#CREA', 30, 52.36322525173981, 4.912826154522691]
 	];
 	
+	
+	// controller
 	GEO.app = {
 		init:function(){
 			GEO.location.init();
@@ -21,7 +25,7 @@ var GEO = GEO || {};
 	};
 	
 	
-	//Location Object
+	// Location Object
 	GEO.location = {
 		refreshRate: 1000,
 		currentPosition: false,
