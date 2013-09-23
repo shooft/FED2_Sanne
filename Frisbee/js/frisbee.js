@@ -119,6 +119,7 @@ var FRISBEE = FRISBEE || {};
 	
 	// Page
 	FRISBEE.page = {
+		// Pagina specifieke code in het page object zetten
 		render: function (route) {
 			console.log("page.render");
 			// data en template samen- en invoegen
