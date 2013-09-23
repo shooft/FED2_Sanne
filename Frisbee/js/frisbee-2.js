@@ -63,6 +63,130 @@ var FRISBEE = FRISBEE || {};
 	};
 	
 	
+	// Template directives - data operaties van JSON naar template
+	FRISBEE.scheduleDirectives ={
+		// teamnamen incl winner class en einduitslag voor tabel
+		games: {
+			score: {
+				text: function(params) {
+					return (this.team1Score + " - " + this.team2Score);
+				}
+			},
+			
+			team1Complete: {
+				text: function(params) {
+					return (this.team1);
+				},
+				class: function(params) {
+					if (parseInt(this.team1Score) > parseInt(this.team2Score)) {
+						return ( "winner" );
+					}
+				}
+			},
+			
+			team2Complete: {
+				text: function(params) {
+					return (this.team2);
+				},
+				class: function(params) {
+					if (parseInt(this.team1Score) < parseInt(this.team2Score)) {
+						return ( "winner" );
+					}
+				}
+			}
+		}
+	};
+	
+	
+	FRISBEE.gameDirectives ={
+		// teamnamen en einduitslag voor de overview tabel
+		result: {
+			text: function(params) {
+				// hoe kan dit (FRISBEE.gameDirectives) korter?
+				return ( FRISBEE.gameDirectives.team1Result() + " - " + FRISBEE.gameDirectives.team2Result());
+			} 
+		},
+		
+		team1Overview: {
+			text: function(params) {
+				return ( FRISBEE.game.scores[0].team1);
+			},
+			class: function(params) {
+				if (FRISBEE.gameDirectives.team1Result() > FRISBEE.gameDirectives.team2Result()) {
+					return ( "winner" );
+				}
+			}
+		},
+		
+		team2Overview: {
+			text: function(params) {
+				return ( FRISBEE.game.scores[0].team2);
+			},
+			class: function(params) {
+				if (FRISBEE.gameDirectives.team1Result() < FRISBEE.gameDirectives.team2Result()) {
+					return ( "winner" );
+				}
+			}
+		},
+		
+		team1Result: function(){
+			return(FRISBEE.game.scores[FRISBEE.game.scores.length-1].team1Score);
+		},
+		team2Result: function(){
+			return(FRISBEE.game.scores[FRISBEE.game.scores.length-1].team2Score);
+		},
+		
+		// de scores voor de detailtabel
+		scores: {
+			interScore: {
+				text: function(params) {
+					return (this.team1Score + " - " + this.team2Score);
+				}
+			},
+			
+			team1Inter: {
+				text: function(params) {
+					return ( this.team1);
+				},
+				class: function(params) {
+					// hoe kan dit (FRISBEE.gameDirectives.scores) korter?
+					if (FRISBEE.gameDirectives.scores.team1InterResult(this) > FRISBEE.gameDirectives.scores.team2InterResult(this)) {
+						return ( "winner" );
+					}
+				}
+			},
+			
+			team2Inter: {
+				text: function(params) {
+					return ( this.team2);
+				},
+				class: function(params) {
+					if (FRISBEE.gameDirectives.scores.team1InterResult(this) < FRISBEE.gameDirectives.scores.team2InterResult(this)) {
+						return ( "winner" );
+					}
+				}
+			},
+			
+			team1InterResult: function(score){
+			 	return(parseInt(score.team1Score));
+			},
+			team2InterResult: function(score){
+			 	return(parseInt(score.team2Score));
+			}
+			
+		}
+	};
+	
+	
+	FRISBEE.rankingDirectives ={
+		teams: {
+			points: {
+				text: function(params) {
+					return (this.Pw - this.Pl);
+				}
+			}
+		}
+	};
 	
 	
 	// Controller Init
@@ -123,7 +247,7 @@ var FRISBEE = FRISBEE || {};
 			console.log("page.render");
 			// data en template samen- en invoegen
 			var data = eval('FRISBEE.'+route);
-			var directives = eval('this.'+route+'Directives');
+			var directives = eval('FRISBEE.'+route+'Directives');
 			Transparency.render(qwery('[data-route='+route+']')[0], data, directives);
 			
 			// extra handelingen per pagina
@@ -137,131 +261,6 @@ var FRISBEE = FRISBEE || {};
 			
 			// zichtbaarheid laten updaten door de router
 			FRISBEE.router.change();
-		},
-		
-		// Template directives - extra data operaties van JSON object richting template
-		scheduleDirectives:{
-			// teamnamen incl winner class en einduitslag voor tabel
-			games: {
-				score: {
-					text: function(params) {
-						return (this.team1Score + " - " + this.team2Score);
-					}
-				},
-				
-				team1Complete: {
-					text: function(params) {
-						return (this.team1);
-					},
-					class: function(params) {
-						if (parseInt(this.team1Score) > parseInt(this.team2Score)) {
-							return ( "winner" );
-						}
-					}
-				},
-				
-				team2Complete: {
-					text: function(params) {
-						return (this.team2);
-					},
-					class: function(params) {
-						if (parseInt(this.team1Score) < parseInt(this.team2Score)) {
-							return ( "winner" );
-						}
-					}
-				}
-			}
-		},
-		
-		
-		gameDirectives:{
-			// teamnamen en einduitslag voor de overview tabel
-			result: {
-				text: function(params) {
-					// hoe kan dit (FRISBEE.gameDirectives) korter?
-					return ( FRISBEE.page.gameDirectives.team1Result() + " - " + FRISBEE.page.gameDirectives.team2Result());
-				} 
-			},
-			
-			team1Overview: {
-				text: function(params) {
-					return ( FRISBEE.game.scores[0].team1);
-				},
-				class: function(params) {
-					if (FRISBEE.page.gameDirectives.team1Result() > FRISBEE.page.gameDirectives.team2Result()) {
-						return ( "winner" );
-					}
-				}
-			},
-			
-			team2Overview: {
-				text: function(params) {
-					return ( FRISBEE.game.scores[0].team2);
-				},
-				class: function(params) {
-					if (FRISBEE.page.gameDirectives.team1Result() < FRISBEE.page.gameDirectives.team2Result()) {
-						return ( "winner" );
-					}
-				}
-			},
-			
-			team1Result: function(){
-				return(FRISBEE.game.scores[FRISBEE.game.scores.length-1].team1Score);
-			},
-			team2Result: function(){
-				return(FRISBEE.game.scores[FRISBEE.game.scores.length-1].team2Score);
-			},
-			
-			// de scores voor de detailtabel
-			scores: {
-				interScore: {
-					text: function(params) {
-						return (this.team1Score + " - " + this.team2Score);
-					}
-				},
-				
-				team1Inter: {
-					text: function(params) {
-						return ( this.team1);
-					},
-					class: function(params) {
-						// hoe kan dit (FRISBEE.gameDirectives.scores) korter?
-						if (FRISBEE.page.gameDirectives.scores.team1InterResult(this) > FRISBEE.page.gameDirectives.scores.team2InterResult(this)) {
-							return ( "winner" );
-						}
-					}
-				},
-				
-				team2Inter: {
-					text: function(params) {
-						return ( this.team2);
-					},
-					class: function(params) {
-						if (FRISBEE.page.gameDirectives.scores.team1InterResult(this) < FRISBEE.page.gameDirectives.scores.team2InterResult(this)) {
-							return ( "winner" );
-						}
-					}
-				},
-				
-				team1InterResult: function(score){
-					return(parseInt(score.team1Score));
-				},
-				team2InterResult: function(score){
-					return(parseInt(score.team2Score));
-				}
-				
-			}
-		},
-		
-		
-		rankingDirectives:{
-			teams: {
-				points: {
-					text: function(params) {
-						return (this.Pw - this.Pl);
-					}
-				}
-			}
 		}
 	}
 	
