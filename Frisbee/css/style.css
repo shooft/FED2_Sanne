@@ -34,8 +34,11 @@ nav ol li{
 nav ol li a:hover{
 	background-color: rgba(100, 200, 100, 0.4);
 }
-nav .active{
+
+nav .active {
 	font-weight:bold;
+	text-decoration:none;
+	color:black;
 }
 
 /* Pages */

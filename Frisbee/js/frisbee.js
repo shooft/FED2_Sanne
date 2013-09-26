@@ -1,75 +1,12 @@
-// JavaScript Document
-
 var FRISBEE = FRISBEE || {};
 
 // self-invoking function om local scope te creeren
 (function () {
 	
-	// Data objecten - voor nu even hier - straks ophalen via de api
-	FRISBEE.schedule = {
-		title:'Pool A - Schedule',
-		games: [
-			{ date: "Monday, 9:00am", team1: "Chasing", team1Score: "13", team2: "Amsterdam Money Gang", team2Score: "9"},
-			{ date: "Monday, 9:00am", team1: "Boomsquad", team1Score: "15", team2: "Beast Amsterdam", team2Score: "11"},
-			{ date: "Monday, 10:00am", team1: "Beast Amsterdam", team1Score: "14", team2: "Amsterdam Money Gang", team2Score: "12"},
-			{ date: "Monday, 10:00am", team1: "Chasing", team1Score: "5", team2: "Burning Snow", team2Score: "15"},
-			{ date: "Monday, 11:00am", team1: "Boomsquad", team1Score: "11", team2: "Amsterdam Money Gang", team2Score: "15"},    
-			{ date: "Monday, 11:00am", team1: "Burning Snow", team1Score: "15", team2: "Beast Amsterdam", team2Score: "6"},
-			{ date: "Monday, 12:00pm", team1: "Chasing", team1Score: "8", team2: "Beast Amsterdam", team2Score: "15"},
-			{ date: "Monday, 12:00pm", team1: "Boomsquad", team1Score: "15", team2: "Burning Snow", team2Score: "8"},
-			{ date: "Monday, 1:00pm", team1: "Chasing", team1Score: "15", team2: "Boomsquad", team2Score: "14"},
-			{ date: "Monday, 1:00pm", team1: "Burning Snow", team1Score: "15", team2: "Amsterdam Money Gang", team2Score: "11"}
-		]
-	};
-	
-	FRISBEE.game = {
-		title:'Pool A - Score: Boomsquad vs. Burning Snow',
-		scores: [
-			{ score: "1", team1:"Boomsquad", team1Score: "1", team2:"Burning Snow", team2Score: "0"},
-			{ score: "2", team1:"Boomsquad", team1Score: "1", team2:"Burning Snow", team2Score: "1"},
-			{ score: "3", team1:"Boomsquad", team1Score: "1", team2:"Burning Snow", team2Score: "2"},
-			{ score: "4", team1:"Boomsquad", team1Score: "2", team2:"Burning Snow", team2Score: "2"},
-			{ score: "5", team1:"Boomsquad", team1Score: "3", team2:"Burning Snow", team2Score: "2"},
-			{ score: "6", team1:"Boomsquad", team1Score: "4", team2:"Burning Snow", team2Score: "2"},
-			{ score: "7", team1:"Boomsquad", team1Score: "5", team2:"Burning Snow", team2Score: "2"},
-			{ score: "8", team1:"Boomsquad", team1Score: "5", team2:"Burning Snow", team2Score: "3"},
-			{ score: "9", team1:"Boomsquad", team1Score: "6", team2:"Burning Snow", team2Score: "3"},
-			{ score: "10", team1:"Boomsquad", team1Score: "7", team2:"Burning Snow", team2Score: "3"},
-			{ score: "11", team1:"Boomsquad", team1Score: "7", team2:"Burning Snow", team2Score: "4"},
-			{ score: "12", team1:"Boomsquad", team1Score: "8", team2:"Burning Snow", team2Score: "4"},
-			{ score: "13", team1:"Boomsquad", team1Score: "8", team2:"Burning Snow", team2Score: "5"},
-			{ score: "14", team1:"Boomsquad", team1Score: "8", team2:"Burning Snow", team2Score: "6"},
-			{ score: "15", team1:"Boomsquad", team1Score: "9", team2:"Burning Snow", team2Score: "6"},
-			{ score: "16", team1:"Boomsquad", team1Score: "9", team2:"Burning Snow", team2Score: "7"},
-			{ score: "17", team1:"Boomsquad", team1Score: "10", team2:"Burning Snow", team2Score: "7"},
-			{ score: "18", team1:"Boomsquad", team1Score: "11", team2:"Burning Snow", team2Score: "7"},
-			{ score: "19", team1:"Boomsquad", team1Score: "12", team2:"Burning Snow", team2Score: "7"},
-			{ score: "20", team1:"Boomsquad", team1Score: "13", team2:"Burning Snow", team2Score: "7"},
-			{ score: "21", team1:"Boomsquad", team1Score: "14", team2:"Burning Snow", team2Score: "7"},
-			{ score: "22", team1:"Boomsquad", team1Score: "14", team2:"Burning Snow", team2Score: "8"},
-			{ score: "23", team1:"Boomsquad", team1Score: "15", team2:"Burning Snow", team2Score: "8"}
-		]
-	};
-	
-	FRISBEE.ranking = {
-		title:'Pool A - Ranking',
-		teams: [
-			{ team: "Chasing", Win: "2", Lost: "2", Sw: "7", Sl: "9", Pw: "35", Pl: "39"},
-			{ team: "Boomsquad", Win: "2", Lost: "2", Sw: "9", Sl: "8", Pw: "36", Pl: "34"},
-			{ team: "Burning Snow", Win: "3", Lost: "1", Sw: "11", Sl: "4", Pw: "36", Pl: "23"},
-			{ team: "Beast Amsterdam", Win: "2", Lost: "2", Sw: "6", Sl: "8", Pw: "30", Pl: "34"},
-			{ team: "Amsterdam Money Gang", Win: "1", Lost: "3", Sw: "6", Sl: "10", Pw: "30", Pl: "37"}
-		]
-	};
-	
-	
-	
-	
 	// Controller Init
 	FRISBEE.controller = {
 		init: function () {
 			// Initialize router
-			console.log("controller.init");
 			FRISBEE.router.init();
 		}
 	};
@@ -78,17 +15,12 @@ var FRISBEE = FRISBEE || {};
 	// Router
 	FRISBEE.router = {
 		init: function () {
-			console.log("router.init");
+			// routing for pages with a name
+			routie('/:pageID', function(pageID) {
+				FRISBEE.page.render(pageID);
+			});
+			// default page
 			routie({
-				'/schedule': function() {
-					FRISBEE.page.render("schedule");
-				},
-				'/game': function() {
-					FRISBEE.page.render("game");
-				},
-				'/ranking': function() {
-					FRISBEE.page.render("ranking");
-				},
 				'*': function() {
 					FRISBEE.page.render("schedule");
 				}
@@ -97,21 +29,23 @@ var FRISBEE = FRISBEE || {};
 	
 		change: function () {
 			var route = window.location.hash.slice(2);
-			console.log("router.change: "+route);
 			var sections = qwery('section[data-route]');
+			var menuItems = qwery('nav a');
 			
-			// Default route
+			// hide/normalize all
+			for (var i=0; i < sections.length; i++){
+				 sections[i].classList.remove('active');
+				 menuItems[i].classList.remove('active');
+			 }
+			// show/highlight active
 			if (!route) {
 				 sections[0].classList.add('active');
+				 menuItems[0].classList.add('active');
 			} else {
-				var section = qwery('[data-route=' + route + ']')[0];
-				// Show active section, hide all other
-				if (section) {
-					 for (var i=0; i < sections.length; i++){
-						 sections[i].classList.remove('active');
-					 }
-					section.classList.add('active');
-				}
+				var section = qwery('[data-route='+route+']')[0];
+				section.classList.add('active');
+				var menuItem = qwery('nav a[href$='+route+']')[0];
+				menuItem.classList.add('active');
 			}
 		}
 	};
@@ -120,148 +54,175 @@ var FRISBEE = FRISBEE || {};
 	// Page
 	FRISBEE.page = {
 		render: function (route) {
-			console.log("page.render");
-			// data en template samen- en invoegen
+			// data ophalen
 			var data = eval('FRISBEE.'+route);
-			var directives = eval('this.'+route+'Directives');
+			// aanvullende bewerkingen op data ophalen die - om meer en rijkere data te kunnen mergen met de template
+			var directives = eval("this."+route+'Directives()');
+			// template, data + rules mergen
 			Transparency.render(qwery('[data-route='+route+']')[0], data, directives);
 			
-			// extra handelingen per pagina
+			// extra handelingen per pagina die niet door transparency gedaan kunnen worden // lelijk :-(
 			if (route == "ranking") {
-				// sort teams by points
-				// is dit zoals je dit doet?
-				var options = { valueNames: [ 'points' ] };
+				// sort teams by netto points
+				var options = { valueNames: ['points'] };
 				var teamList = new List('ranking', options);
 				teamList.sort('points', { asc: false });
 			}
 			
-			// zichtbaarheid laten updaten door de router
+			// zichtbaarheid van de secties laten updaten door de router
 			FRISBEE.router.change();
 		},
 		
-		// Template directives - extra data operaties van JSON object richting template
-		scheduleDirectives:{
-			// teamnamen incl winner class en einduitslag voor tabel
-			games: {
-				score: {
+		// Template directives - data operaties die transparency gebruikt om de data te bewerken
+		// rules voor schedule pagina
+		scheduleDirectives: function() {
+			var JSONrules = {		
+				// voor de titel 
+				scheduleTitle: {
 					text: function(params) {
-						return (this.team1Score + " - " + this.team2Score);
+						return ("Pool "+this.pool+" - "+params.value);
 					}
 				},
-				
-				team1Complete: {
-					text: function(params) {
-						return (this.team1);
-					},
-					class: function(params) {
-						if (parseInt(this.team1Score) > parseInt(this.team2Score)) {
-							return ( "winner" );
+				// voor elke game
+				games: {
+					// de einduitslag
+					score: {
+						text: function(params) {
+							return (this.team1Score+" - "+this.team2Score);
 						}
-					}
-				},
-				
-				team2Complete: {
-					text: function(params) {
-						return (this.team2);
 					},
-					class: function(params) {
-						if (parseInt(this.team1Score) < parseInt(this.team2Score)) {
-							return ( "winner" );
+					// teamnaam1 inclusief winner class or not
+					team1Complete: {
+						text: function(params) {
+							return (this.team1);
+						},
+						class: function(params) {
+							if (parseInt(this.team1Score) > parseInt(this.team2Score)) {
+								return ( "winner" );
+							}
+						}
+					},
+					// teamnaam1 inclusief winner class or not
+					team2Complete: {
+						text: function(params) {
+							return (this.team2);
+						},
+						class: function(params) {
+							if (parseInt(this.team1Score) < parseInt(this.team2Score)) {
+								return ( "winner" );
+							}
 						}
 					}
 				}
-			}
+			};
+			return JSONrules;
 		},
 		
-		
-		gameDirectives:{
-			// teamnamen en einduitslag voor de overview tabel
-			result: {
-				text: function(params) {
-					// hoe kan dit (FRISBEE.gameDirectives) korter?
-					return ( FRISBEE.page.gameDirectives.team1Result() + " - " + FRISBEE.page.gameDirectives.team2Result());
-				} 
-			},
-			
-			team1Overview: {
-				text: function(params) {
-					return ( FRISBEE.game.scores[0].team1);
-				},
-				class: function(params) {
-					if (FRISBEE.page.gameDirectives.team1Result() > FRISBEE.page.gameDirectives.team2Result()) {
-						return ( "winner" );
-					}
-				}
-			},
-			
-			team2Overview: {
-				text: function(params) {
-					return ( FRISBEE.game.scores[0].team2);
-				},
-				class: function(params) {
-					if (FRISBEE.page.gameDirectives.team1Result() < FRISBEE.page.gameDirectives.team2Result()) {
-						return ( "winner" );
-					}
-				}
-			},
-			
-			team1Result: function(){
-				return(FRISBEE.game.scores[FRISBEE.game.scores.length-1].team1Score);
-			},
-			team2Result: function(){
-				return(FRISBEE.game.scores[FRISBEE.game.scores.length-1].team2Score);
-			},
-			
-			// de scores voor de detailtabel
-			scores: {
-				interScore: {
+		// rules voor game pagina
+		gameDirectives: function () {
+			var JSONrules =  {
+				// voor de titel
+				gameTitle: {
 					text: function(params) {
-						return (this.team1Score + " - " + this.team2Score);
+						return ("Pool "+this.pool+" - "+params.value+": "+JSONrules.teamName(1)+" vs. "+JSONrules.teamName(2));
 					}
 				},
-				
-				team1Inter: {
+				// voor de overview regel
+				// de einduitslag
+				result: {
 					text: function(params) {
-						return ( this.team1);
+						return ( JSONrules.teamResult(1) + " - " + JSONrules.teamResult(2));
+					} 
+				},
+				// teamnaam1 inclusief winner class or not
+				team1Overview: {
+					text: function(params) {
+						return (JSONrules.teamName(1));
 					},
 					class: function(params) {
-						// hoe kan dit (FRISBEE.gameDirectives.scores) korter?
-						if (FRISBEE.page.gameDirectives.scores.team1InterResult(this) > FRISBEE.page.gameDirectives.scores.team2InterResult(this)) {
+						if (JSONrules.teamResult(1) > JSONrules.teamResult(2)) {
 							return ( "winner" );
 						}
 					}
 				},
-				
-				team2Inter: {
+				// teamnaam2 inclusief winner class or not
+				team2Overview: {
 					text: function(params) {
-						return ( this.team2);
+						return (JSONrules.teamName(2));
 					},
 					class: function(params) {
-						if (FRISBEE.page.gameDirectives.scores.team1InterResult(this) < FRISBEE.page.gameDirectives.scores.team2InterResult(this)) {
+						if (JSONrules.teamResult(1) < JSONrules.teamResult(2)) {
 							return ( "winner" );
 						}
 					}
 				},
-				
-				team1InterResult: function(score){
-					return(parseInt(score.team1Score));
+				// functie die naam van meegegeven team bepaald
+				teamName: function(team){
+					return(eval('FRISBEE.game.scores[0].team'+team));
 				},
-				team2InterResult: function(score){
-					return(parseInt(score.team2Score));
+				// functie die eindscore van meegegeven team bepaald
+				teamResult: function(team){
+					return(parseInt(eval('FRISBEE.game.scores[FRISBEE.game.scores.length-1].team'+team+'Score')));
+				},
+				// voor de detail tabel
+				// voor elke score in de wedstrijd
+				scores: {
+					// de tussenstand
+					interScore: {
+						text: function(params) {
+							return (this.team1Score + " - " + this.team2Score);
+						}
+					},
+					// teamnaam1 inclusief winner class or not op dat moment
+					team1Inter: {
+						text: function(params) {
+							return ( this.team1);
+						},
+						class: function(params) {
+							if (JSONrules.scores.teamInterResult(this, 1) > JSONrules.scores.teamInterResult(this, 2)) {
+								return ( "winner" );
+							}
+						}
+					},
+					// teamnaam2 inclusief winner class or not op dat moment
+					team2Inter: {
+						text: function(params) {
+							return ( this.team2);
+						},
+						class: function(params) {
+							if (JSONrules.scores.teamInterResult(this, 1) < JSONrules.scores.teamInterResult(this, 2)) {
+								return ( "winner" );
+							}
+						}
+					},
+					// functie die aantal punten van meegegeven tussenstand van meegegeven team bepaald
+					teamInterResult: function(score, team){
+						return(parseInt(eval('score.team'+team+'Score')));
+					},
 				}
-				
-			}
+			};
+			return JSONrules;
 		},
 		
-		
-		rankingDirectives:{
-			teams: {
-				points: {
+		// rules voor ranking pagina
+		rankingDirectives: function() {
+			var JSONrules = {
+				//voor de titel
+				rankingTitle: {
 					text: function(params) {
-						return (this.Pw - this.Pl);
+						return ("Pool "+this.pool+" - "+params.value);
+					}
+				},
+				//voor elk team
+				teams: {
+					points: {
+						text: function(params) {
+							return (parseInt(this.Pw) - parseInt(this.Pl));
+						}
 					}
 				}
-			}
+			};
+			return JSONrules;
 		}
 	}
 	
