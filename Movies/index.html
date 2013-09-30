@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Threesome Ultimate Frisbee - Game + Movies</title>
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+
+        <header>
+            <h1><span>Tournament: </span>Amsterdam Ultimate Autumn</h1>
+        </header>
+        <nav>
+            <ol>
+                <li><a href="#/schedule">Schedule page</a></li>
+                <li><a href="#/game">Game page</a></li>
+                <li><a href="#/ranking">Ranking page</a></li>
+				<li><a href="#/movies">Movies page</a></li>
+            </ol>
+        </nav>
+		<article>
+			<section data-route="schedule" id="schedule">
+				<header>
+					<h1 data-bind="scheduleTitle">Schedule</h1>
+				</header>
+				<table>
+					<thead>
+						<tr>
+							<th>Monday 18 March</th>
+							<th>Team</th>
+							<th>Result</th>
+							<th>Team</th>
+						</tr>
+					</thead>
+					<tbody data-bind="games">
+						<tr>
+							<td data-bind="date"></td>
+							<td data-bind="team1Complete"></td>
+							<td data-bind="score"></td>
+							<td data-bind="team2Complete"></td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+			
+			<section data-route="game" id="game">
+				<header>
+					<h1 data-bind="gameTitle">Score</h1>
+				</header>
+				<table>
+					<thead>
+						<tr>
+							<th>Team</th>
+							<th>Result</th>
+							<th>Team</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td data-bind="team1Overview"></td>
+							<td data-bind="result"></td>
+							<td data-bind="team2Overview"></td>
+						</tr>
+					</tbody>
+				</table>
+	
+				<table>
+					<thead>
+						<tr>
+							<th>Score</th>
+							<th>Team</th>
+							<th>Points</th>
+							<th>Team</th>
+						</tr>
+					</thead>
+	
+					<tbody data-bind="scores">
+						<tr>
+							<td data-bind="score"></td>
+							<td data-bind="team1Inter"></td>
+							<td data-bind="interScore"></td>
+							<td data-bind="team2Inter"></td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+			
+			<section data-route="ranking" id="ranking">
+				<header>
+					<h1 data-bind="rankingTitle">Ranking</h1>
+				</header>
+				<table>
+					<thead>
+						<tr>
+							<th>Team</th>
+							<th>W</th>
+							<th>L</th>
+							<th>Points won</th>
+							<th>Points lost</th>
+							<th>+/-</th>
+						</tr>
+					</thead>
+					<tbody data-bind="teams" class="list">
+						<tr>
+							<td class="team" data-bind="team"></td>
+							<td class="wins" data-bind="Win"></td>
+							<td class="losses" data-bind="Lost"></td>
+							<td class="pw" data-bind="Pw"></td>
+							<td class="pl" data-bind="Pl"></td>
+							<td class="points" data-bind="points"></td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+			
+			<section data-route="movies" id="movies">
+				<header>
+					<h1>Movies</h1>
+				</header>
+				<table>
+					<thead>
+						<tr>
+							<th>Titel</th>
+							<!--th>Omschrijving</th>
+							<th>Release date</th>
+							<th>Poster</th-->
+						</tr>
+					</thead>
+					<tbody data-bind="movies" class="list">
+						<tr>
+							<td class="movieTitle" data-bind="movieTitle"></td>
+							<!--td class="description" data-bind="description"></td>
+							<td class="release_date" data-bind="release_date"></td>
+							<td class="cover" data-bind="cover"></td-->
+						</tr>
+					</tbody>
+				</table>
+			</section>
+			
+		</article>
+		
+		<!-- Libs -->
+		<script src="js/libs/routie.min.js"></script>
+		<script src="js/libs/ready.min.js"></script>
+		<script src="js/libs/qwery.min.js"></script>
+		<script src="js/libs/transparancy.min.js"></script>
+		<script src="js/libs/list.min.js"></script>
+		<script src="js/libs/microajax.minified.js"></script>
+	
+		<!-- Application -->
+		<script src="js/frisbee_movies.js"></script>
+		<script src="js/data.js"></script>
+	</body>
+</html>

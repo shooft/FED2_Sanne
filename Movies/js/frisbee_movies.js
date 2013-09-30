@@ -20,11 +20,11 @@ var FRISBEE = FRISBEE || {};
 				FRISBEE.page.render(pageID);
 			});
 			// default page
-			routie({
+			/*routie({
 				'*': function() {
 					FRISBEE.page.render("schedule");
 				}
-			});
+			});*/
 		},
 	
 		change: function () {
@@ -54,13 +54,26 @@ var FRISBEE = FRISBEE || {};
 	// Page
 	FRISBEE.page = {
 		render: function (route) {
-			// data ophalen
-			var data = eval('FRISBEE.'+route);
-			// hier is eval gevaarlijk omdat er user data uit de url gebruikt wordt
-			// aanvullende bewerkingen op data ophalen die - om meer en rijkere data te kunnen mergen met de template
-			var directives = eval("this."+route+'Directives()');
-			// template, data + rules mergen
-			Transparency.render(qwery('[data-route='+route+']')[0], data, directives);
+			var data;
+			if (route == "movies") {
+				// data via ajax ophalen
+				var directives = this.moviesDirectives();
+				console.log(directives);
+				microAjax("http://dennistel.nl/movies", function (res) {
+				  	var movieList = new Object();
+					movieList.movies = res;
+					console.log(movieList);
+				  	Transparency.render(qwery('[data-route='+route+']')[0], movieList, directives);
+				});
+			} else {
+				
+				// data object ophalen
+				data = eval('FRISBEE.'+route);
+				// aanvullende bewerkingen op data ophalen die - om meer en rijkere data te kunnen mergen met de template
+				var directives = eval("this."+route+'Directives()');
+				// template, data + rules mergen
+				Transparency.render(qwery('[data-route='+route+']')[0], data, directives);
+			}
 			
 			// extra handelingen per pagina die niet door transparency gedaan kunnen worden // lelijk :-(
 			if (route == "ranking") {
@@ -159,7 +172,6 @@ var FRISBEE = FRISBEE || {};
 				},
 				// functie die naam van meegegeven team bepaald
 				teamName: function(team){
-					// hier is eval niet echt gevaarlijk omdat er interne data gebruikt wordt
 					return(eval('FRISBEE.game.scores[0].team'+team));
 				},
 				// functie die eindscore van meegegeven team bepaald
@@ -220,6 +232,20 @@ var FRISBEE = FRISBEE || {};
 					points: {
 						text: function(params) {
 							return (parseInt(this.Pw) - parseInt(this.Pl));
+						}
+					}
+				}
+			};
+			return JSONrules;
+		},
+		
+		// rules voor movies pagina
+		moviesDirectives: function() {
+			var JSONrules = {
+				movies: {
+					movieTitle: {
+						text: function(params) {
+							return ("eerste titel");
 						}
 					}
 				}
