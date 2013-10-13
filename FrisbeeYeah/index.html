@@ -47,7 +47,7 @@
 									<table>
 										<tr class="theScore">
 											<td class="team1Name" data-bind="team1Complete"></td>
-											<td class="score" data-bind="score"></td>
+											<td class="score"><span class="team1Score" data-bind="team_1_score"></span> - <span class="team2Score" data-bind="team_2_score"></span></td>
 											<td class="team2Name" data-bind="team2Complete"></td>
 										</tr>
 									</table>
@@ -89,8 +89,6 @@
 		</div>
 		
 		<!-- Libs -->
-		<script scr="js/libs/modernizr.custom.78983.js"></script>
-		
 		<script src="js/libs/routie.min.js"></script>
 		<script src="js/libs/ready.min.js"></script>
 		<script src="js/libs/qwery.min.js"></script>
@@ -99,16 +97,12 @@
 		<script src="js/libs/date-utils.min.js"></script>
 		<script src="js/libs/vine.min.js"></script>
 		<script src="js/libs/spin.min.js"></script>
-		
 		<script src="js/libs/hammer.min.js"></script>
-		
 		<script src="js/libs/modernizr.js"></script>
 		
-		
-		
-	
 		<!-- Application -->
 		<script src="js/frisbee.js"></script>
+		<script src="js/libs/myAjax.js"></script>
 		<script src="js/libs/ptr.js"></script>
 	</body>
 </html>

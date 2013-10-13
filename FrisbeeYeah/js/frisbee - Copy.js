@@ -83,7 +83,6 @@ var FRISBEE = FRISBEE || {};
 	
 	// Schedule
 	FRISBEE.schedule = {
-		// render the list of games
 		render: function(){
 			var self = this;
 			var url = 'https://api.leaguevine.com/v1/games/?tournament_id=19389&order_by=%5Bstart_time%5D&fields=%5Bid%2Cteam_1_score%2Cteam_2_score%2Cteam_1%2Cteam_2%2Cstart_time%2Cpool%5D'
@@ -97,7 +96,9 @@ var FRISBEE = FRISBEE || {};
 				// bind a click event to each game
 				var gameList = qwery('#gameList .game');
 				for (var i=0; i < gameList.length; i++){
-					FRISBEE.game.initScoring(gameList[i].id);
+					vine.bind(gameList[i].id, "click", function(e){
+						FRISBEE.game.startScoring(e.currentTarget.id);
+					});
 				}
 				FRISBEE.page.change();
 			}
@@ -107,7 +108,67 @@ var FRISBEE = FRISBEE || {};
 		scheduleDirectives: function() {
 			var JSONrules = {		
 				// voor elke game
-				objects: FRISBEE.game.gameDirectives()
+				objects: {
+					// id van de game
+					gameId: {
+						id: function(){
+							return(this.id);
+						}
+					},
+					// formatted startdatum en -tijd
+					startDate: {
+						text: function(){
+							var startDate = new Date(this.start_time);
+							return(startDate.toFormat('DDD D MMM'));
+						}
+					},
+					startTime: {
+						text: function(){
+							var startTime = new Date(this.start_time);
+							return(startTime.toFormat('HH:MI'));
+						}
+					},
+					// pool
+					pool: {
+						text: function(){
+							return("Pool "+ this.pool.name);
+						}
+					},
+					// de einduitslag
+					score: {
+						html: function() {
+							return ('<span class="team1Score">'+this.team_1_score+'</span>-<span class="team2Score">'+this.team_2_score+'</span>');
+						}
+					},
+					// teamnaam1 inclusief winner class or not
+					team1Complete: {
+						text: function() {
+							return (this.team_1.name);
+						},
+						id: function() {
+							return (this.team_1_id);
+						},
+						class: function() {
+							if (parseInt(this.team_1_score) > parseInt(this.team_2_score)) {
+								return ( "team1Name winner" );
+							}
+						}
+					},
+					// teamnaam2 inclusief winner class or not
+					team2Complete: {
+						text: function() {
+							return (this.team_2.name);
+						},
+						id: function() {
+							return (this.team_2_id);
+						},
+						class: function() {
+							if (parseInt(this.team_1_score) < parseInt(this.team_2_score)) {
+								return ( "team2Name winner" );
+							}
+						}
+					}
+				}
 			};
 			return JSONrules;
 		}
@@ -119,36 +180,15 @@ var FRISBEE = FRISBEE || {};
 		// winning score
 		WINNINGSCORE: 15,
 		
-		// react on start scoring request
-		initScoring: function(gameID){
-			var self = this;
-			vine.bind(gameID, "click", function(e){
-				self.startScoring(e.currentTarget.id);
-			});
-		},
-		
-		startScoring: function(gameID){
-			// only once - check if already in edit mode
-			if ( !qwery('#'+gameID)[0].classList.contains('editMode') ){
-				// determine game element
-				var gameEl = qwery('#'+gameID+" .theGame table tbody")[0];
-				// create button html
-				var buttons = '<tr class="theControls"><td><input name="team1plus1" type="button" value="Puntje erbij!" onclick="FRISBEE.game.postScore('+gameID+', 1)"></td>';
-				var buttons = buttons + '<td><input name="stopScoring" id="stopScoring" type="button" value="X" onclick="FRISBEE.game.stopScoring('+gameID+')"></td>';
-				var buttons = buttons + '<td><input name="team2plus1" type="button" value="Puntje erbij!" onclick="FRISBEE.game.postScore('+gameID+', 2)"></td></tr>';
-				// from normal to display mode with scoring controls
-				gameEl.innerHTML = gameEl.innerHTML + buttons;
-				// activate edit mode
-				qwery('#'+gameID)[0].classList.add('editMode');
-			}
-		},
-		
-		stopScoring: function(gameID){
-			// remove buttons
-			var theScore = qwery('#'+gameID+' .theScore')[0].innerHTML;
-			qwery('#'+gameID+' table tbody')[0].innerHTML = '<tr class="theScore" >'+theScore+'</tr>';
-			// exit edit mode
-			qwery('#'+gameID)[0].classList.remove('editMode');
+		// informatie over de game ophalen en op het scherm tonen	
+		render: function (gameID) {
+			var gameEl = qwery('#'+gameID+" .theGame table tbody")[0];
+			
+			var buttons = '<tr class="theControls"><td><input name="team1plus1" type="button" value="Puntje erbij!" onclick="FRISBEE.game.postScore('+gameID+', 1)"></td>';
+			var buttons = buttons + '<td><input name="stopScoring" id="stopScoring" type="button" value="X" onclick="FRISBEE.game.stopScoring('+gameID+')"></td>';
+			var buttons = buttons + '<td><input name="team2plus1" type="button" value="Puntje erbij!" onclick="FRISBEE.game.postScore('+gameID+', 2)"></td></tr>';
+			
+			gameEl.innerHTML = gameEl.innerHTML + buttons;
 		},
 		
 		// een score voor een game doorgeven aan LeagueVine
@@ -182,32 +222,36 @@ var FRISBEE = FRISBEE || {};
 			};
 		},
 		
+		startScoring: function(gameID){
+			// check if already in edit mode
+			if ( !qwery('#'+gameID)[0].classList.contains('editMode') ){
+				// add buttons
+				this.render(gameID);
+				// activate edit mode
+				qwery('#'+gameID)[0].classList.add('editMode');
+			}
+		},
+		
+		stopScoring: function(gameID){
+			// remove buttons
+			var theScore = qwery('#'+gameID+' .theScore')[0].innerHTML;
+			qwery('#'+gameID+' table tbody')[0].innerHTML = '<tr class="theScore" >'+theScore+'</tr>';
+			// remove edit class
+			qwery('#'+gameID)[0].classList.remove('editMode');
+		},
+		
 		// rules voor ranking pagina
 		gameDirectives: function() {
 			var JSONrules = {
-				// id van de game
-				gameId: {
-					id: function(){
-						return(this.id);
+				// de einduitslag
+				team1Score: {
+					text: function() {
+						return (this.team_1_score);
 					}
 				},
-				// formatted startdatum en -tijd
-				startDate: {
-					text: function(){
-						var startDate = new Date(this.start_time);
-						return(startDate.toFormat('DDD D MMM'));
-					}
-				},
-				startTime: {
-					text: function(){
-						var startTime = new Date(this.start_time);
-						return(startTime.toFormat('HH:MI'));
-					}
-				},
-				// pool
-				pool: {
-					text: function(){
-						return("Pool "+ this.pool.name);
+				team2Score: {
+					text: function() {
+						return (this.team_2_score);
 					}
 				},
 				// teamnaam1 inclusief winner class or not
@@ -221,6 +265,8 @@ var FRISBEE = FRISBEE || {};
 					class: function() {
 						if (parseInt(this.team_1_score) > parseInt(this.team_2_score)) {
 							return ( "team1Name winner" );
+						} else {
+							return ( "team1Name" );
 						}
 					}
 				},
@@ -235,6 +281,8 @@ var FRISBEE = FRISBEE || {};
 					class: function() {
 						if (parseInt(this.team_1_score) < parseInt(this.team_2_score)) {
 							return ( "team2Name winner" );
+						} else {
+							return ( "team2Name" );
 						}
 					}
 				}
@@ -294,7 +342,6 @@ var FRISBEE = FRISBEE || {};
 			]
 		}
 	};
-	
 	
 	//spinner
 	FRISBEE.spinner = {
