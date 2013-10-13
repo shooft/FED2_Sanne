@@ -224,4 +224,3 @@ refresh.handler = function() {
 	FRISBEE.page.render("schedule");
 	this.slideUp();
 };
-

@@ -9,6 +9,10 @@ var FRISBEE = FRISBEE || {};
 	// Controller Init
 	FRISBEE.controller = {
 		init: function () {
+			// Initialize spinner
+			FRISBEE.page.init();
+			// Initialize spinner
+			//FRISBEE.pullToRefresh.init();
 			// Initialize router
 			FRISBEE.router.init();
 		}
@@ -335,11 +339,31 @@ var FRISBEE = FRISBEE || {};
 		}
 	};
 	
+	//pull to refresh
+	FRISBEE.pullToRefresh = {
+		init: function(){
+			var container_el = this.getEl('container');
+			var pullrefresh_el = this.getEl('pullrefresh');
+			var pullrefresh_icon_el = this.getEl('pullrefresh-icon');
+			
+			var refresh = new PullToRefresh(container_el, pullrefresh_el, pullrefresh_icon_el);
+			// update image onrefresh
+			refresh.handler = function() {
+				FRISBEE.page.render("schedule");
+				this.slideUp();
+			};
+			
+			console.log(refresh);
+		},
+		
+		getEl: function (id) {
+			return document.getElementById(id);
+		},
+	},
+	
 	
 	// DOM ready
 	domready(function () {
-		// Initialize spinner
-		FRISBEE.page.init();
 		// Kickstart application
 		FRISBEE.controller.init();
 	});
