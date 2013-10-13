@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+        <title>Threesome Ultimate Frisbee - Game + Movies</title>
+        <link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="css/ptr.css" />
+    </head>
+    <body>
+		<!-- container voor spinner -->
+		<div id="spinnerContainer" class="spinnerContainer"></div>
+		
+		<!-- container voor pull to refresh -->
+		<div id="container">
+			<!-- pull to refresh area -->
+			<div id="pullrefresh">
+				<div class="message">
+					<div id="pullrefresh-icon" class="icon arrow arrow-down"></div>
+					<span></span>
+				</div>
+			</div>
+		
+			<!-- the real stuff -->
+			<div id="content">
+				<header>
+					<h1><span>Tournament: </span>Amsterdam Ultimate Autumn</h1>
+					<nav>
+						<ol>
+							<li><a href="#/schedule">The Schedule</a></li><li><a href="#/ranking">The Ranking</a></li>
+						   
+						</ol>
+					</nav>
+				</header>
+				
+				<article>	
+					<section data-route="schedule" id="schedule">
+						<ul id="gameList" data-bind="objects">
+							<li class="game" data-bind="gameId">
+								<header class="gameMeta">
+									<p class="startDate" data-bind="startDate"></p>
+									<p class="startTime" data-bind="startTime"></p>
+									<p class="pitch">Field D</p>
+									<p class="pool" data-bind="pool"></p>
+								</header>
+								<main class="theGame">
+									<table>
+										<tr class="theScore">
+											<td class="team1Name" data-bind="team1Complete"></td>
+											<td class="score" data-bind="score"></td>
+											<td class="team2Name" data-bind="team2Complete"></td>
+										</tr>
+									</table>
+								</main>
+							</li>
+						</ul>
+					</section>
+					
+					<section data-route="ranking" id="ranking">
+						<header>
+							<h1 data-bind="rankingTitle">Ranking</h1>
+						</header>
+						<table>
+							<thead>
+								<tr>
+									<th>Team</th>
+									<th>W</th>
+									<th>L</th>
+									<th>Points won</th>
+									<th>Points lost</th>
+									<th>+/-</th>
+								</tr>
+							</thead>
+							<tbody data-bind="teams" class="list">
+								<tr>
+									<td data-bind="team"></td>
+									<td data-bind="Win"></td>
+									<td data-bind="Lost"></td>
+									<td data-bind="Pw"></td>
+									<td data-bind="Pl"></td>
+									<td data-bind="points" class="points"></td>
+								</tr>
+							</tbody>
+						</table>
+					</section>
+					
+				</article>
+			</div>
+		</div>
+		
+		<!-- Libs -->
+		<script scr="js/libs/modernizr.custom.78983.js"></script>
+		
+		<script src="js/libs/routie.min.js"></script>
+		<script src="js/libs/ready.min.js"></script>
+		<script src="js/libs/qwery.min.js"></script>
+		<script src="js/libs/transparancy.min.js"></script>
+		<script src="js/libs/list.min.js"></script>
+		<script src="js/libs/date-utils.min.js"></script>
+		<script src="js/libs/vine.min.js"></script>
+		<script src="js/libs/spin.min.js"></script>
+		
+		<script src="js/libs/hammer.min.js"></script>
+		
+		<script src="js/libs/modernizr.js"></script>
+		
+		
+		
+	
+		<!-- Application -->
+		<script src="js/frisbee.js"></script>
+		<script src="js/libs/ptr.js"></script>
+	</body>
+</html>

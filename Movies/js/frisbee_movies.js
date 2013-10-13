@@ -58,12 +58,10 @@ var FRISBEE = FRISBEE || {};
 			if (route == "movies") {
 				// data via ajax ophalen
 				var directives = this.moviesDirectives();
-				console.log(directives);
 				microAjax("http://dennistel.nl/movies", function (res) {
-				  	var movieList = new Object();
-					movieList.movies = res;
+				  	var movieList = JSON.parse(res);
 					console.log(movieList);
-				  	Transparency.render(qwery('[data-route='+route+']')[0], movieList, directives);
+				  	Transparency.render(qwery('[data-route='+route+'] tbody')[0], movieList, directives);
 				});
 			} else {
 				
@@ -71,7 +69,7 @@ var FRISBEE = FRISBEE || {};
 				data = eval('FRISBEE.'+route);
 				// aanvullende bewerkingen op data ophalen die - om meer en rijkere data te kunnen mergen met de template
 				var directives = eval("this."+route+'Directives()');
-				// template, data + rules mergen
+				// template, data + rules merg
 				Transparency.render(qwery('[data-route='+route+']')[0], data, directives);
 			}
 			
@@ -242,13 +240,12 @@ var FRISBEE = FRISBEE || {};
 		// rules voor movies pagina
 		moviesDirectives: function() {
 			var JSONrules = {
-				movies: {
-					movieTitle: {
-						text: function(params) {
-							return ("eerste titel");
-						}
+				cover: {
+					src: function(params) {
+						return(this.cover);
 					}
 				}
+	
 			};
 			return JSONrules;
 		}

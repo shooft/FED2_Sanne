@@ -1,0 +1,207 @@
+/*
+Copyright (c) 2011 Ylab,www.ylab.nl
+YUI reset.css,version:2.9.0
+*/
+html{color:#000;background:#fff}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,select,p,blockquote,th,td,figure{margin:0;padding:0}
+abbr,acronym{border:0;font-variant:normal}
+address,button,caption,cite,code,dfn,em,input,optgroup,option,select,strong,textarea,th,var{font:inherit}
+caption,th{text-align:left}
+del,ins{text-decoration:none}
+fieldset,img{border:0}
+h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}
+legend{color:#000}
+ul,ol{list-style:none}
+q:before,q:after{content:''}
+sub,sup{vertical-align:baseline}
+table{border-collapse:collapse;border-spacing:0}
+/* reset additions */
+:focus{outline:0}
+section,article,footer,header,nav,aside,figure{display:block;margin:0;padding:0}
+select,input{background:none}
+textarea{resize:none}
+a{text-decoration:none}
+b,strong{font-weight:bold}
+i,em{font-style:italic}
+
+html{
+	height:100%;
+	background:#ccc;
+}
+body{
+	position:relative;
+	font-family:Tahoma, Geneva, sans-serif;
+    font-size:90%;
+    line-height:150%;
+	height:100%;
+}
+
+/* Spinner */
+.spinnerContainer {
+	position:absolute;
+	height:0;
+	width:100%;
+	top:0;
+	left:0;
+}
+
+.spinnerContainer.spinning {
+	height:100%;
+}
+
+/* Header */
+#content > header{
+	position:relative;
+	background:#5f6e33 url(../images/dog-with-frisbee.png) no-repeat top right;
+	text-align:left;
+	height:10em;
+	width:100%;
+}
+#content > header h1{
+	font-size:150%;
+	color:white;
+	width:60%;
+	padding:0.5em;
+}
+#content > header h1 span{
+	font-size: 50%;
+	display:block;
+}
+
+/* Menu */
+nav{
+	position:absolute;
+	bottom:0;
+	width:100%;
+}
+nav ol{
+	text-align: center;
+}
+nav li{
+	display:inline-block;
+	width:50%;
+}
+nav a {
+	display:block;
+	padding:0.75em;
+	text-decoration:none;
+	background:rgba(255,255,255,0.1);
+	color:rgba(255,255,255,0.5);
+}
+nav a:hover{
+	background:rgba(0,0,0,0.1);
+	color:rgba(255,255,255,0.75);
+}
+
+nav .active,
+nav .active:hover {
+	background:rgba(0,0,0,0.25);
+	color:rgba(255,255,255,1);
+}
+
+/* Pages */
+article > section {
+	display:none;
+}
+
+article > section.active {
+	display:block;
+}
+
+/* Gamelist */
+#gameList {
+}
+
+#gameList .game {
+	margin:0 0 1px;
+	padding:0 0.75em 0.5em;
+	background:#fff;
+	cursor:pointer;
+}
+#gameList .game.editMode {
+	cursor:default;
+}
+
+/* de wedstrijd meta */
+#gameList .game .gameMeta {
+	overflow:auto;
+}
+
+#gameList .game .gameMeta p{
+	color:#ccc;
+	font-size:80%;
+}
+#gameList .game .gameMeta .startDate,
+#gameList .game .gameMeta .startTime,
+#gameList .game .gameMeta .pitch {
+	float:left;
+	padding:0 1em 0 1.25em;
+}
+
+#gameList .game .gameMeta .startDate {
+	background:url(../images/calendar.png) no-repeat left center;
+}
+
+#gameList .game .gameMeta .startTime {
+	background:url(../images/clock.png) no-repeat left center;
+}
+
+#gameList .game .gameMeta .pitch {
+	background:url(../images/pos-marker.png) no-repeat left center;
+}
+
+#gameList .game .gameMeta .pool {
+	float:right;
+}
+
+/* de wedstrijd itself */
+#gameList .game .theGame {
+}
+#gameList .game .theGame table {
+	text-align:center;
+	width: 100%;
+	background:#fff;
+}
+
+#gameList .game .theScore {
+	height:5em;
+}
+
+#gameList .game .theScore td {
+	line-height:1em;
+}
+
+#gameList .game .theScore .team1Name,
+#gameList .game .theScore .team2Name {
+	width:38%;
+}
+
+#gameList .game .theScore .winner {
+	color:#900;
+}
+
+#gameList .game .theScore .score {
+	width:24%;
+	text-align: center;
+	font-size:1.25em;
+	font-weight:bold;
+}
+
+/* de buttons */
+#gameList .game .theControls td {
+	padding:0 0 1.5em;
+}
+#gameList .game .theControls input {
+	border:none;
+	background:#5f6e33;
+	color:#fff;
+	padding:0.5em 0.25em;
+	-webkit-border-radius:0.25em;
+	border-radius:0.25em; 
+	cursor:pointer;
+}
+
+#gameList .game .theControls input#stopScoring {
+	padding:0.25em 0.5em;
+	background:#ccc;
+}
