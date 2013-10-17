@@ -26,7 +26,7 @@ i,em{font-style:italic}
 
 html{
 	height:100%;
-	background:#ccc;
+	background:#ddd;
 }
 body{
 	position:relative;
@@ -36,55 +36,88 @@ body{
 	height:100%;
 }
 
+/* SPECIALS */
 /* Spinner */
 .spinnerContainer {
-	position:absolute;
 	height:0;
 	width:100%;
 	top:0;
 	left:0;
+	z-index:10000;
+}
+
+.spinnerContainer.global {
+	position:fixed;
+}
+
+.spinnerContainer.local {
+	position:absolute;
 }
 
 .spinnerContainer.spinning {
 	height:100%;
 }
 
-/* Header */
-#content > header{
-	position:relative;
-	background:#5f6e33 url(../images/dog-with-frisbee.png) no-repeat top right;
-	text-align:left;
-	height:10em;
-	width:100%;
-}
-#content > header h1{
+
+/* BASIC ELEMENTS */
+h1 {
 	font-size:150%;
 	color:white;
 	width:60%;
-	padding:0.5em;
+	padding:0.25em 0.5em;
 }
-#content > header h1 span{
-	font-size: 50%;
+h1 span {
+	font-size:50%;
 	display:block;
 }
 
+h2 {
+	font-size:150%;
+	color:#000;
+}
+
+a {
+	text-decoration:none;
+}
+
+table {
+	width:100%;
+}
+
+.smallPrint {
+	font-size:80%;
+}
+
+article > section > ul > li {
+	position:relative;
+	background:#fff;
+	border-bottom:dotted 1px #ccc;
+}
+
+
+/* HEADER */
+body > header{
+	position:relative;
+	background:#5f6e33 url(../images/dog-with-frisbee.png) no-repeat top right;
+	height:9em;
+}
+
 /* Menu */
-nav{
+nav {
 	position:absolute;
 	bottom:0;
 	width:100%;
 }
-nav ol{
+nav ol {
 	text-align: center;
 }
-nav li{
+nav li {
 	display:inline-block;
 	width:50%;
 }
 nav a {
 	display:block;
 	padding:0.75em;
-	text-decoration:none;
 	background:rgba(255,255,255,0.1);
 	color:rgba(255,255,255,0.5);
 }
@@ -92,14 +125,16 @@ nav a:hover{
 	background:rgba(0,0,0,0.1);
 	color:rgba(255,255,255,0.75);
 }
-
 nav .active,
 nav .active:hover {
 	background:rgba(0,0,0,0.25);
 	color:rgba(255,255,255,1);
 }
 
-/* Pages */
+/* THE PAGE (ARTICLE) */
+article {
+}
+
 article > section {
 	display:none;
 }
@@ -108,100 +143,139 @@ article > section.active {
 	display:block;
 }
 
-/* Gamelist */
+/* THE SCHEDULE */
+/* gamelist */
 #gameList {
 }
 
+/* game - container */
 #gameList .game {
-	margin:0 0 1px;
-	padding:0 0.75em 0.5em;
-	background:#fff;
+	text-align:center;
+}
+
+#gameList .game.displayMode {
 	cursor:pointer;
 }
-#gameList .game.editMode {
+
+#gameList .game.finished {
+	background:#f2f2f2;
 	cursor:default;
 }
 
-/* de wedstrijd meta */
+/* game - meta */
 #gameList .game .gameMeta {
-	overflow:auto;
+	padding:0.25em 0.75em 0;
 }
 
-#gameList .game .gameMeta p{
+#gameList .game .gameMeta li{
+	display:inline-block;
+	padding:0 0.5em;
+	color:#999;
+}
+
+#gameList .game.editMode .gameMeta li,
+#gameList .game.finished .gameMeta li {
 	color:#ccc;
-	font-size:80%;
-}
-#gameList .game .gameMeta .startDate,
-#gameList .game .gameMeta .startTime,
-#gameList .game .gameMeta .pitch {
-	float:left;
-	padding:0 1em 0 1.25em;
 }
 
-#gameList .game .gameMeta .startDate {
-	background:url(../images/calendar.png) no-repeat left center;
-}
-
-#gameList .game .gameMeta .startTime {
-	background:url(../images/clock.png) no-repeat left center;
-}
-
-#gameList .game .gameMeta .pitch {
-	background:url(../images/pos-marker.png) no-repeat left center;
-}
-
-#gameList .game .gameMeta .pool {
-	float:right;
-}
-
-/* de wedstrijd itself */
-#gameList .game .theGame {
-}
-#gameList .game .theGame table {
-	text-align:center;
-	width: 100%;
-	background:#fff;
-}
-
+/* game - score */
 #gameList .game .theScore {
-	height:5em;
+	padding:1em;
 }
 
 #gameList .game .theScore td {
-	line-height:1em;
+	text-align:center;
 }
 
-#gameList .game .theScore .team1Name,
-#gameList .game .theScore .team2Name {
-	width:38%;
+/* game - score - score */
+#gameList .game .theScore td.score {
+	height:3.2em;
+	width:26%;
+	padding:0 0 1em;
+	font-size:1.5em;
 }
 
-#gameList .game .theScore .winner {
-	color:#900;
+/* game - score - names */
+#gameList .game .theScore td.teamName {
+	height:4em;
+	width:37%;
+	padding:0 0.5em 1.25em;
 }
 
-#gameList .game .theScore .score {
-	width:24%;
-	text-align: center;
-	font-size:1.25em;
-	font-weight:bold;
-}
-
-/* de buttons */
-#gameList .game .theControls td {
-	padding:0 0 1.5em;
-}
-#gameList .game .theControls input {
-	border:none;
-	background:#5f6e33;
-	color:#fff;
-	padding:0.5em 0.25em;
-	-webkit-border-radius:0.25em;
-	border-radius:0.25em; 
+#gameList .game.editMode .theScore td.teamName {
+	background:#910;
 	cursor:pointer;
 }
 
-#gameList .game .theControls input#stopScoring {
-	padding:0.25em 0.5em;
-	background:#ccc;
+#gameList .game.finished .theScore td.teamName.winner {
+	background:url(../images/trophy.png) no-repeat center top;
+}
+
+#gameList .game .theScore td.teamName div {
+	position:relative;
+}
+
+#gameList .game .theScore td.teamName div .theName {
+	display:block;
+	line-height:1.1em;
+}
+
+#gameList .game.editMode .theScore td.teamName div .theName {
+	color:#fff;
+}
+
+#gameList .game .theScore td.teamName.winner div .theName {
+	color:#900;
+}
+
+#gameList .game.editMode .theScore td.teamName.winner div .theName {
+	color:#fc0;
+}
+
+/* game - score - names - insctruction */
+#gameList .game .theScore td.teamName div .instruction {
+	display:none;
+}
+
+#gameList .game.editMode .theScore td.teamName div .instruction {
+	display:block;
+	position:absolute;
+	bottom:-1.5em;
+	width:100%;
+	color:rgba(255,255,255,0.5);
+}
+
+/* RANKING */
+#poolList .pool {
+	padding:1.5em;
+}
+
+.theRanking {
+	
+}
+.theRanking th,
+.theRanking td {
+	width:13%;
+	line-height:1.25em;
+	padding:0.5em 0.5em 0.5em 0;
+	text-align:center;
+}
+
+.theRanking td:first-child,
+.theRanking th:first-child {
+	width:35%;
+	padding-left:0.75em;
+	text-align:left;
+}
+
+.theRanking th {
+	color:#999;
+}
+
+.theRanking td {
+	background:#f2f2f2;
+}
+
+.theRanking tr:nth-child(even) td {
+	background:#f8f8f8;
 }

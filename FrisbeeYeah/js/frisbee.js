@@ -1,24 +1,37 @@
 //namespace
 var FRISBEE = FRISBEE || {};
 
+
 // self-invoking function om local scope te creeren
 (function () {
 	// Set script to ECMA 5 (including native JSON support)
 	"use strict";
 	
+	
+	// Settings
+	FRISBEE.settings = {
+		lvToken: 'bearer 82996312dc',
+		
+		lvGetListOfGames:'https://api.leaguevine.com/v1/games/?tournament_id=19389&order_by=%5Bid%5D&fields=%5Bid%2Cteam_1_score%2Cteam_2_score%2Cteam_1%2Cteam_2%2Cstart_time%2Cpool%2Cwinner_id%5D&limit=200',
+		
+		lvPostGameScore: 'https://api.leaguevine.com/v1/game_scores/',
+		
+		lvGetListOfPools: 'https://api.leaguevine.com/v1/pools/?tournament_id=19389&order_by=%5Bid%5D&fields=%5Bid%2C%20name%2C%20standings%5D&access_token=90073a56bd'
+	};
+	
+	
 	// Controller Init
 	FRISBEE.controller = {
 		init: function () {
-			// Initialize spinner
+			// Initialize page
 			FRISBEE.page.init();
-			// Initialize spinner
-			//FRISBEE.pullToRefresh.init();
 			// Initialize router
 			FRISBEE.router.init();
 		}
 	};
 	
-	// Router
+	
+	// Router - afhandelen van urls
 	FRISBEE.router = {
 		init: function () {
 			routie('/:pageID', function(pageID) {
@@ -32,10 +45,15 @@ var FRISBEE = FRISBEE || {};
 		}
 	};
 	
-	// Page
+	
+	// Page - de baas over de algemene dingen van de pagina
 	FRISBEE.page = {
+		pageSpinTarget: document.getElementById('pageSpinnerContainer'),
+		pageSpinner: {},
+			
 		init: function(){
-			FRISBEE.spinner.init();
+			// Initialize spinner
+			this.pageSpinner = FRISBEE.utils.spinner.init("large");
 		},
 		// bepalen welke pagina om aandacht roept
 		render: function (route) {	
@@ -52,58 +70,55 @@ var FRISBEE = FRISBEE || {};
 		// zichtbaarheid van de secties updaten
 		change: function () {
 			var route = window.location.hash.slice(2);
-			var sections = qwery('section[data-route]');
-			var menuItems = qwery('nav a');
 			
 			// hide sections
-			for (var i=0; i < sections.length; i++){
-				sections[i].classList.remove('active');
-			}
+			$('section[data-route]').removeClass('active');
 			// show section
-			var section = qwery('#'+route)[0];
-			section.classList.add('active');
+			$('#'+route).addClass('active');
 			
 			// normalize menu items
-			for (var i=0; i < menuItems.length; i++){
-				menuItems[i].classList.remove('active');
-			}
+			$('nav a').removeClass('active');
 			// emphasize menu item
-			if (route=="schedule") {
-				menuItems[0].classList.add('active');
-			} else if (route=="ranking") {
-				menuItems[1].classList.add('active');
-			}
+			$( "nav a[href='#/"+route+"']" ).addClass('active');
 		},
 		
+		// start feedback during long process
 		startLongProcess: function(){
-			FRISBEE.spinner.startSpin();
+			this.pageSpinTarget.classList.add('spinning');
+			this.pageSpinner.spin(this.pageSpinTarget);
 		},
 		
+		// end feedback during long process
 		endLongProcess: function(){
-			FRISBEE.spinner.stopSpin();
+			this.pageSpinner.stop(this.pageSpinTarget);
+			this.pageSpinTarget.classList.remove('spinning');
+			
 		}
 	}
 	
 	
-	// Schedule
+	// Schedule - het lijstje met games
 	FRISBEE.schedule = {
 		// render the list of games
 		render: function(){
 			var self = this;
-			var url = 'https://api.leaguevine.com/v1/games/?tournament_id=19389&order_by=%5Bstart_time%5D&fields=%5Bid%2Cteam_1_score%2Cteam_2_score%2Cteam_1%2Cteam_2%2Cstart_time%2Cpool%5D'
+			var url = FRISBEE.settings.lvGetListOfGames;
+			// start spinning
+			FRISBEE.page.startLongProcess();
 			// Get schedule data from LaegueVine
 			FRISBEE.myAjax.get(url,displayResults);
 			
 			// Display schedule data om screen
 			function displayResults(games){
 				// ask tranparency to combine data and template
-				Transparency.render(qwery('[data-route=schedule]')[0], games, self.scheduleDirectives());
+				Transparency.render($('[data-route=schedule]')[0], games, self.scheduleDirectives());
 				// bind a click event to each game
-				var gameList = qwery('#gameList .game');
+				var gameList = $('#gameList .game');
 				for (var i=0; i < gameList.length; i++){
-					FRISBEE.game.initScoring(gameList[i].id);
+					FRISBEE.game.init(gameList[i].id);
 				}
 				FRISBEE.page.change();
+				FRISBEE.page.endLongProcess();
 			}
 		},
 		
@@ -118,49 +133,114 @@ var FRISBEE = FRISBEE || {};
 	};
 	
 	
-	// Game
+	// Game - een game in het lijstje
 	FRISBEE.game = {
 		// winning score
 		WINNINGSCORE: 15,
 		
+		gameSpinner: {},
+		
 		// react on start scoring request
-		initScoring: function(gameID){
+		init: function(gameID){
 			var self = this;
-			vine.bind(gameID, "click", function(e){
-				self.startScoring(e.currentTarget.id);
-			});
+			
+			// on swipe left or right switch mode
+			var element = document.getElementById(gameID);
+    		Hammer(element).on("swiperight swipeleft", function(e) {
+        		self.swithGameMode(e.currentTarget.id, e.type);
+    		});
+			$("#"+gameID).on("click", function(e) {
+        		self.swithGameMode(e.currentTarget.id, e.type);
+    		});
+			// unbind leftover events from buttons
+			$( "#"+gameID+" .theScore .teamName" ).off();
 		},
 		
-		startScoring: function(gameID){
-			// only once - check if already in edit mode
-			if ( !qwery('#'+gameID)[0].classList.contains('editMode') ){
-				// determine game element
-				var gameEl = qwery('#'+gameID+" .theGame table tbody")[0];
-				// create button html
-				var buttons = '<tr class="theControls"><td><input name="team1plus1" type="button" value="Puntje erbij!" onclick="FRISBEE.game.postScore('+gameID+', 1)"></td>';
-				var buttons = buttons + '<td><input name="stopScoring" id="stopScoring" type="button" value="X" onclick="FRISBEE.game.stopScoring('+gameID+')"></td>';
-				var buttons = buttons + '<td><input name="team2plus1" type="button" value="Puntje erbij!" onclick="FRISBEE.game.postScore('+gameID+', 2)"></td></tr>';
-				// from normal to display mode with scoring controls
-				gameEl.innerHTML = gameEl.innerHTML + buttons;
-				// activate edit mode
-				qwery('#'+gameID)[0].classList.add('editMode');
+		swithGameMode: function(gameID, eventType){
+			var self = this;
+			var gameMode;
+			var flipDirection;
+			
+			// negeren als game busy of finished is
+			if (  ( !$('#'+gameID).hasClass('busy') && !$('#'+gameID).hasClass('finished') ) ) {
+			
+				// determine current mode
+				if ( $('#'+gameID).hasClass('editMode') ) {
+					gameMode = "editMode";
+					flipDirection = "lr";
+				} else {
+					gameMode = "displayMode";
+					flipDirection = "rl";
+				}
+				
+				// determine flip direction based on the event type
+				if ( eventType == "swipeleft") {
+					flipDirection = "rl";
+				} else if ( eventType == "swiperight") {
+					flipDirection = "lr";
+				}
+				
+				// flip the game
+				$("#"+gameID).flip({
+					direction:flipDirection,
+					color:"#fff",
+					onAnimation: function(){
+						// go to edit mode		
+						if ( gameMode == "displayMode" ){
+							self.displayToEdit(gameID);
+						}
+						// go back to display mode
+						else {
+							self.editToDisplay(gameID);
+						}
+					},
+					onEnd: function(){
+						$('#'+gameID).attr("style","");
+					}
+					
+				})
 			}
 		},
 		
-		stopScoring: function(gameID){
-			// remove buttons
-			var theScore = qwery('#'+gameID+' .theScore')[0].innerHTML;
-			qwery('#'+gameID+' table tbody')[0].innerHTML = '<tr class="theScore" >'+theScore+'</tr>';
-			// exit edit mode
-			qwery('#'+gameID)[0].classList.remove('editMode');
+		displayToEdit: function(gameID){
+			var self = this;
+			$('#'+gameID).removeClass('displayMode').addClass('editMode');
+							
+			// add event to buttons	
+			$( "#"+gameID+" .theScore .teamName" ).on("click", function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				// determine game ID and team number of scoring team
+				var gameID = $(this).closest(".game")[0].id;
+				var teamNumber;
+				if ($(this).hasClass("team1")){
+					teamNumber = 1;
+				} else {
+					teamNumber = 2;
+				}
+				// start processing score
+				self.postScore(gameID, teamNumber);
+			});
+		},
+		
+		editToDisplay: function(gameID){
+			// game from edit to display
+			$('#'+gameID).removeClass('editMode').addClass('displayMode');
+			// unbind event from buttons
+			$( "#"+gameID+" .theScore .teamName" ).off();
 		},
 		
 		// een score voor een game doorgeven aan LeagueVine
-		postScore: function(gameID, teamNumber){
+		postScore: function(gameID, teamNumber){		
 			var self = this;
+			
+			//add spinner
+			this.startLongProcess(gameID);
+			
 			// huidige score
-			var team1Score = parseInt(qwery('#'+gameID+' .team1Score')[0].innerHTML);
-			var team2Score = parseInt(qwery('#'+gameID+' .team2Score')[0].innerHTML);
+			var team1Score = parseInt($('#'+gameID+' .teamScore.team1').text());
+			var team2Score = parseInt($('#'+gameID+' .teamScore.team2').text());
+			
 			// score updaten
 			if (teamNumber == 1) {
 				team1Score = team1Score + 1;
@@ -168,31 +248,77 @@ var FRISBEE = FRISBEE || {};
 				team2Score = team2Score + 1;
 			};
 			
+			// determine if game is final
+			var isFinal = false;
+			if (team1Score == this.WINNINGSCORE || team2Score == this.WINNINGSCORE) {
+				isFinal =  true;
+			}
+			
 			// ajaxData samenstellen
-			var url = 'https://api.leaguevine.com/v1/game_scores/';
+			var url = FRISBEE.settings.lvPostGameScore;
 			var gameScore = {
 					game_id: gameID,
 					team_1_score: team1Score,
 					team_2_score: team2Score,
-					is_final: 'False'
+					is_final: isFinal
 					};
 			// data naar LaegueVine sturen
 			FRISBEE.myAjax.post(url,gameScore,displayResults);
 			
 			// de score op het scherm updaten na het posten van een score
-			function displayResults(gameScore){
-				var theGame = qwery('#'+gameID+' .theGame')[0];
-				Transparency.render(qwery('#'+gameID+' .theGame')[0], gameScore, self.gameDirectives());
+			function displayResults(gameScoreRetour){
+				// update score
+				var theGame = $('#'+gameID+" .theScore")[0];
+				Transparency.render(theGame, gameScoreRetour, self.gameDirectives());
+				//remove spinner
+				self.endLongProcess(gameID);
+				// check if game is finished
+				if (gameScoreRetour.is_final) {
+					// tell game it is final
+					$('#'+gameID).addClass("finished");
+					// and back to display mode
+					self.editToDisplay(gameID);
+				}
 			};
+		},
+		
+		//start feedback during long process
+		startLongProcess: function(gameID){
+			$("#"+gameID).addClass("busy");
+			this.gameSpinner[gameID] = FRISBEE.utils.spinner.init("small");
+			// add spinner container
+			$("#"+gameID).prepend('<div id="gameSpinnerContainer'+gameID+'" class="spinnerContainer local"></div>');
+			//spin target
+			var spinTarget = $("#"+gameID+" .spinnerContainer")[0];
+			spinTarget.classList.add('spinning');
+			this.gameSpinner[gameID].spin(spinTarget);
+		},
+		
+		//end feedback during long process
+		endLongProcess: function(gameID){
+			var spinTarget = $("#"+gameID+" .spinnerContainer")[0];
+			this.gameSpinner[gameID].stop(spinTarget);
+			spinTarget.classList.remove('spinning');
+			$("#"+gameID+" .spinnerContainer").remove();
+			$("#"+gameID).removeClass("busy");
 		},
 		
 		// rules voor ranking pagina
 		gameDirectives: function() {
+			var self = this;
+			
 			var JSONrules = {
 				// id van de game
-				gameId: {
+				game: {
 					id: function(){
 						return(this.id);
+					},
+					class: function() {
+						if( this.winner_id != null){
+							return("game displayMode finished");
+						} else {
+							return("game displayMode");
+						}
 					}
 				},
 				// formatted startdatum en -tijd
@@ -205,7 +331,7 @@ var FRISBEE = FRISBEE || {};
 				startTime: {
 					text: function(){
 						var startTime = new Date(this.start_time);
-						return(startTime.toFormat('HH:MI'));
+						return(startTime.toFormat('HH:MI P'));
 					}
 				},
 				// pool
@@ -214,156 +340,195 @@ var FRISBEE = FRISBEE || {};
 						return("Pool "+ this.pool.name);
 					}
 				},
-				// teamnaam1 inclusief winner class or not
+				// teamnamen inclusief winner class or not
+				team1Winner: {
+					class: function() {
+						if (parseInt(this.team_1_score) > parseInt(this.team_2_score)) {
+							return ( "teamName team1 winner" );
+						} else {
+							return ( "teamName team1" );
+						}
+					}
+				},
+				team2Winner: {
+					class: function() {
+						if (parseInt(this.team_1_score) < parseInt(this.team_2_score)) {
+							return ( "teamName team2 winner" );
+						} else {
+							return ( "teamName team2" );
+						}
+					}
+				},
 				team1Complete: {
 					text: function() {
 						return (this.team_1.name);
 					},
 					id: function() {
 						return (this.team_1_id);
-					},
-					class: function() {
-						if (parseInt(this.team_1_score) > parseInt(this.team_2_score)) {
-							return ( "team1Name winner" );
-						}
 					}
 				},
-				// teamnaam2 inclusief winner class or not
 				team2Complete: {
 					text: function() {
 						return (this.team_2.name);
 					},
 					id: function() {
 						return (this.team_2_id);
-					},
-					class: function() {
-						if (parseInt(this.team_1_score) < parseInt(this.team_2_score)) {
-							return ( "team2Name winner" );
-						}
-					}
-				}
-			};
-			return JSONrules;
-		},
-	};
-	
-	
-	// Ranking
-	FRISBEE.ranking = {
-		render: function(){
-			// data object ophalen
-			var data = this.rankingData;
-			// aanvullende bewerkingen op data ophalen die - om meer en rijkere data te kunnen mergen met de template
-			var directives = this.rankingDirectives();
-			// template, data + rules merg
-			Transparency.render(qwery('[data-route=ranking]')[0], data, directives);
-			
-			// sort teams by netto points
-			var options = { valueNames: ['points'] };
-			var teamList = new List('ranking', options);
-			teamList.sort('points', { asc: false });
-			
-			FRISBEE.page.change();
-		},
-		
-		// rules voor ranking pagina
-		rankingDirectives: function() {
-			var JSONrules = {
-				//voor de titel
-				rankingTitle: {
-					text: function(params) {
-						return ("Pool "+this.pool+" - "+params.value);
 					}
 				},
-				//voor elk team
-				teams: {
-					points: {
-						text: function() {
-							return (parseInt(this.Pw) - parseInt(this.Pl));
+				instruction1: {
+					text: function() {
+						if (parseInt(this.team_1_score) == self.WINNINGSCORE-1) {
+							return ("Oeeeh spannend!");
+						} else {
+							return ("Puntje erbij!");
+						}
+					}
+				},
+				instruction2: {
+					text: function() {
+						if (parseInt(this.team_2_score) == self.WINNINGSCORE-1) {
+							return ("Oeeeh spannend!");
+						} else {
+							return ("Puntje erbij!");
 						}
 					}
 				}
 			};
 			return JSONrules;
 		},
-		
-		rankingData: {
-			pool:'A',
-			teams: [
-				{ team: "Chasing", Win: "2", Lost: "2", Sw: "7", Sl: "9", Pw: "35", Pl: "39"},
-				{ team: "Boomsquad", Win: "2", Lost: "2", Sw: "9", Sl: "8", Pw: "36", Pl: "34"},
-				{ team: "Burning Snow", Win: "3", Lost: "1", Sw: "11", Sl: "4", Pw: "36", Pl: "23"},
-				{ team: "Beast Amsterdam", Win: "2", Lost: "2", Sw: "6", Sl: "8", Pw: "30", Pl: "34"},
-				{ team: "Amsterdam Money Gang", Win: "1", Lost: "3", Sw: "6", Sl: "10", Pw: "30", Pl: "37"}
-			]
-		}
 	};
 	
 	
-	//spinner
-	FRISBEE.spinner = {
-		//spinner as part of ajax
-		spinOpts: {
-			lines: 13, // The number of lines to draw
-			length: 16, // The length of each line
-			width: 8, // The line thickness
-			radius: 24, // The radius of the inner circle
-			corners: 1, // Corner roundness (0..1)
-			rotate: 0, // The rotation offset
-			direction: 1, // 1: clockwise, -1: counterclockwise
-			color: '#666', // #rgb or #rrggbb or array of colors
-			speed: 0.5, // Rounds per second
-			trail: 60, // Afterglow percentage
-			shadow: false, // Whether to render a shadow
-			hwaccel: false, // Whether to use hardware acceleration
-			className: 'spinner', // The CSS class to assign to the spinner
-			zIndex: 2e9, // The z-index (defaults to 2000000000)
-			top: 'auto', // Top position relative to parent in px
-			left: 'auto' // Left position relative to parent in px
-		},
-		spinTarget: document.getElementById('spinnerContainer'),
-		spinnertje: {},
-		
-		init: function(){
-			this.spinnertje = new Spinner(this.spinOpts);
-		},
-		
-		startSpin: function() {
-			this.spinTarget.classList.add('spinning');
-			this.spinnertje.spin(this.spinTarget);
-		},
-		
-		stopSpin: function() {
-			this.spinnertje.stop();
-			this.spinTarget.classList.remove('spinning');
-		}
-	};
-	
-	//pull to refresh
-	FRISBEE.pullToRefresh = {
-		init: function(){
-			var container_el = this.getEl('container');
-			var pullrefresh_el = this.getEl('pullrefresh');
-			var pullrefresh_icon_el = this.getEl('pullrefresh-icon');
+	// Ranking - de stand
+	FRISBEE.ranking = {
+		// render the list of pools
+		render: function(){
+			var self = this;
+			var url = FRISBEE.settings.lvGetListOfPools;
+			// start spinning
+			FRISBEE.page.startLongProcess();
+			// Get schedule data from LaegueVine
+			FRISBEE.myAjax.get(url,displayResults);
 			
-			var refresh = new PullToRefresh(container_el, pullrefresh_el, pullrefresh_icon_el);
-			// update image onrefresh
-			refresh.handler = function() {
-				FRISBEE.page.render("schedule");
-				this.slideUp();
+			// Display schedule data om screen
+			function displayResults(pools){
+				// ask tranparency to combine data and template
+				Transparency.render($('[data-route=ranking]')[0], pools, self.rankingDirectives());
+				// sort teams in the pools
+				var poolList = $('#poolList .pool');
+				for (var i=0; i < poolList.length; i++){
+					FRISBEE.pool.init(poolList[i].id);
+				}
+				FRISBEE.page.change();
+				FRISBEE.page.endLongProcess();
+			}
+		},
+		
+		// rules voor schedule pagina
+		rankingDirectives: function() {
+			var JSONrules = {		
+				// voor elke game
+				objects: FRISBEE.pool.poolDirectives()
 			};
-			
-			console.log(refresh);
+			return JSONrules;
+		}
+	};
+	
+	FRISBEE.pool = {
+		init: function(poolID){
+			// sort teams by netto points
+			var options = { valueNames: ['plus_minus'] };
+			var teamList = new List(poolID, options);
+			teamList.sort('plus_minus', { asc: false });
 		},
 		
-		getEl: function (id) {
-			return document.getElementById(id);
-		},
-	},
+		// rules voor pool object
+		poolDirectives: function() {
+			var JSONrules = {		
+				//pool ID
+				poolID: {
+					id: function() {
+						return (this.id);
+					}
+				},
+				
+				//poolName
+				poolName: {
+					html: function(params) {
+						return ("<h2>Pool "+this.name+"</h2>");
+					}
+				},
+				
+				//teamName
+				standings: {
+					teamName: {
+						text: function() {
+							return (this.team.name);
+						}
+					}
+				}				
+			};
+			return JSONrules;
+		}
+	};
+	
+	// utils
+	FRISBEE.utils = {
+		spinner: {
+			//spinner as part of ajax
+			spinOptsLarge: {
+				lines: 13, // The number of lines to draw
+				length: 24, // The length of each line
+				width: 12, // The line thickness
+				radius: 36, // The radius of the inner circle
+				corners: 1, // Corner roundness (0..1)
+				rotate: 0, // The rotation offset
+				direction: 1, // 1: clockwise, -1: counterclockwise
+				color: '#666', // #rgb or #rrggbb or array of colors
+				speed: 0.5, // Rounds per second
+				trail: 60, // Afterglow percentage
+				shadow: false, // Whether to render a shadow
+				hwaccel: false, // Whether to use hardware acceleration
+				className: 'spinner', // The CSS class to assign to the spinner
+				zIndex: 2e9, // The z-index (defaults to 2000000000)
+				top: 'auto', // Top position relative to parent in px
+				left: 'auto' // Left position relative to parent in px
+			},
+			
+			spinOptsSmall: {
+				lines: 13, // The number of lines to draw
+				length: 16, // The length of each line
+				width: 8, // The line thickness
+				radius: 24, // The radius of the inner circle
+				corners: 1, // Corner roundness (0..1)
+				rotate: 0, // The rotation offset
+				direction: 1, // 1: clockwise, -1: counterclockwise
+				color: '#666', // #rgb or #rrggbb or array of colors
+				speed: 0.5, // Rounds per second
+				trail: 60, // Afterglow percentage
+				shadow: false, // Whether to render a shadow
+				hwaccel: false, // Whether to use hardware acceleration
+				className: 'spinner', // The CSS class to assign to the spinner
+				zIndex: 2e9, // The z-index (defaults to 2000000000)
+				top: 'auto', // Top position relative to parent in px
+				left: 'auto' // Left position relative to parent in px
+			},
+			
+			init: function(size){
+				var spinOpts;
+				if (size == "large") {
+					spinOpts = this.spinOptsLarge;
+				} else {
+					spinOpts = this.spinOptsSmall;
+				}
+				return (new Spinner(spinOpts));
+			}
+		}
+	};
 	
 	
 	// DOM ready
-	domready(function () {
+	$(function() {
 		// Kickstart application
 		FRISBEE.controller.init();
 	});

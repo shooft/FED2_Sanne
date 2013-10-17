@@ -1,8 +1,5 @@
 (function(){
 	FRISBEE.myAjax = {
-		// LaegueVine authentication token
-		TOKEN: 'bearer 82996312dc',
-		
 		// get en post methods
 		post: function(url,postData,callback){
 			var xhr = this.createAndOpenRequest('POST', url, callback);
@@ -19,9 +16,6 @@
 		createAndOpenRequest: function(type, url, callback){
 			var self = this;
 			
-			// start spinning
-			FRISBEE.page.startLongProcess();
-			
 			// Create request
 			var xhr = new XMLHttpRequest();
 			
@@ -30,7 +24,7 @@
 			
 			// Set request headers
 			xhr.setRequestHeader('Content-type','application/json');
-			xhr.setRequestHeader('Authorization', this.TOKEN);
+			xhr.setRequestHeader('Authorization', FRISBEE.settings.lvToken);
 			xhr.onreadystatechange = ensureReadiness;
 			
 			function ensureReadiness () {
@@ -45,8 +39,6 @@
 				if(xhr.readyState === 4) {
 					// return JSON as JSON object
 					callback(JSON.parse(xhr.response));
-					// start spinning
-					FRISBEE.page.endLongProcess();
 				}
 			};
 			

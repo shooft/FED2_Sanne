@@ -212,15 +212,16 @@ function getEl(id) {
 	return document.getElementById(id);
 }
 
-var container_el = getEl('container');
-var pullrefresh_el = getEl('pullrefresh');
-var pullrefresh_icon_el = getEl('pullrefresh-icon');
-var image_el = getEl('random-image');
 
-var refresh = new PullToRefresh(container_el, pullrefresh_el, pullrefresh_icon_el);
-
-// update image onrefresh
-refresh.handler = function() {
-	FRISBEE.page.render("schedule");
-	this.slideUp();
-};
+//var container_el = getEl('container');
+//var pullrefresh_el = getEl('pullrefresh');
+//var pullrefresh_icon_el = getEl('pullrefresh-icon');
+//var image_el = getEl('random-image');
+//
+//var refresh = new PullToRefresh(container_el, pullrefresh_el, pullrefresh_icon_el);
+//
+//// update image onrefresh
+//refresh.handler = function() {
+//	FRISBEE.page.render("schedule");
+//	this.slideUp();
+//};
