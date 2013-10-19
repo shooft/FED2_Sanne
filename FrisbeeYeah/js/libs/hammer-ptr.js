@@ -74,21 +74,15 @@ var PullToRefresh = (function() {
 
 				// cancel animation
 				cancelAnimationFrame(this._anim);
-
+				
+				// hide it
+				this.slidebox.className = 'slideup';
+				this.container.className = 'pullrefresh-slideup';
+				this.hide();
+					
 				// over the breakpoint, trigger the callback
-				if(ev.gesture.deltaY >= this.breakpoint) {
-					container_el.className = 'pullrefresh-loading';
-					pullrefresh_icon_el.className = 'icon loading';
-
-					this.setHeight(60);
+				if(ev.gesture.deltaY * 0.4 >= this.breakpoint) {	
 					this.handler.call(this);
-				}
-				// just hide it
-				else {
-					pullrefresh_el.className = 'slideup';
-					container_el.className = 'pullrefresh-slideup';
-
-					this.hide();
 				}
 				break;
 
@@ -109,9 +103,6 @@ var PullToRefresh = (function() {
 					this.updateHeight();
 				}
 
-
-				
-				
 				// stop browser scrolling
 				ev.gesture.preventDefault();
 
@@ -129,7 +120,6 @@ var PullToRefresh = (function() {
 	 */
 	Main.prototype.setHeight = function(height) {
 		if(Modernizr.csstransforms3d) {
-			
 			this.container.style.transform = 'translate3d(0,'+height+'px,0) ';
 			this.container.style.oTransform = 'translate3d(0,'+height+'px,0)';
 			this.container.style.msTransform = 'translate3d(0,'+height+'px,0)';
@@ -153,7 +143,7 @@ var PullToRefresh = (function() {
 	 * hide the pullrefresh message and reset the vars
 	 */
 	Main.prototype.hide = function() {
-		container_el.className = '';
+		this.container.className = '';
 		this._slidedown_height = 0;
 		this.setHeight(0);
 		cancelAnimationFrame(this._anim);
@@ -169,8 +159,8 @@ var PullToRefresh = (function() {
 		var self = this;
 		cancelAnimationFrame(this._anim);
 
-		pullrefresh_el.className = 'slideup';
-		container_el.className = 'pullrefresh-slideup';
+		this.slidebox.className = 'slideup';
+		this.container.className = 'pullrefresh-slideup';
 
 		this.setHeight(0);
 
@@ -185,10 +175,11 @@ var PullToRefresh = (function() {
 	 */
 	Main.prototype.updateHeight = function() {
 		var self = this;
+
 		this.setHeight(this._slidedown_height);
-		
+
 		if(this._slidedown_height >= this.breakpoint){
-			this.slidebox.className = 'breakpoint';
+			this.slidebox.className = 'pullrefresh-breakpoint';
 			this.slidebox_icon.className = 'icon arrow arrow-up';
 		}
 		else {
@@ -199,10 +190,8 @@ var PullToRefresh = (function() {
 		this._anim = requestAnimationFrame(function() {
 			self.updateHeight();
 		});
-		
-		
 	};
-	
+
 	return Main;
 })();
 
@@ -211,17 +200,3 @@ var PullToRefresh = (function() {
 function getEl(id) {
 	return document.getElementById(id);
 }
-
-
-//var container_el = getEl('container');
-//var pullrefresh_el = getEl('pullrefresh');
-//var pullrefresh_icon_el = getEl('pullrefresh-icon');
-//var image_el = getEl('random-image');
-//
-//var refresh = new PullToRefresh(container_el, pullrefresh_el, pullrefresh_icon_el);
-//
-//// update image onrefresh
-//refresh.handler = function() {
-//	FRISBEE.page.render("schedule");
-//	this.slideUp();
-//};

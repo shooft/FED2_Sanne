@@ -30,7 +30,7 @@ var FRISBEE = FRISBEE || {};
 		}
 	};
 	
-	
+
 	// Router - afhandelen van urls
 	FRISBEE.router = {
 		init: function () {
@@ -50,13 +50,17 @@ var FRISBEE = FRISBEE || {};
 	FRISBEE.page = {
 		pageSpinTarget: document.getElementById('pageSpinnerContainer'),
 		pageSpinner: {},
+		pullToRefresh:{},
 			
 		init: function(){
 			// Initialize spinner
 			this.pageSpinner = FRISBEE.utils.spinner.init("large");
+			// Initialize pull to refresh
+			this.pullToRefresh = FRISBEE.utils.pullToRefresh.init(this.refreshPage);
 		},
+		
 		// bepalen welke pagina om aandacht roept
-		render: function (route) {	
+		render: function (route) {
 			// data voor de speelschema ophalen en invoegen
 			if (route == "schedule") {
 				FRISBEE.schedule.render();
@@ -65,6 +69,12 @@ var FRISBEE = FRISBEE || {};
 			else if (route == "ranking") {
 				FRISBEE.ranking.render();
 			}
+		},
+		
+		// refresh the content of the page
+		refreshPage: function(){
+			var route = window.location.hash.slice(2);
+			FRISBEE.page.render(route);
 		},
 		
 		// zichtbaarheid van de secties updaten
@@ -105,6 +115,7 @@ var FRISBEE = FRISBEE || {};
 			var url = FRISBEE.settings.lvGetListOfGames;
 			// start spinning
 			FRISBEE.page.startLongProcess();
+			FRISBEE.page.change();
 			// Get schedule data from LaegueVine
 			FRISBEE.myAjax.get(url,displayResults);
 			
@@ -117,7 +128,7 @@ var FRISBEE = FRISBEE || {};
 				for (var i=0; i < gameList.length; i++){
 					FRISBEE.game.init(gameList[i].id);
 				}
-				FRISBEE.page.change();
+				$('#gameList').show();
 				FRISBEE.page.endLongProcess();
 			}
 		},
@@ -132,15 +143,15 @@ var FRISBEE = FRISBEE || {};
 		}
 	};
 	
-	
-	// Game - een game in het lijstje
+
+	// Game - een game in de Schedule
 	FRISBEE.game = {
 		// winning score
 		WINNINGSCORE: 15,
-		
+		// array of game spinners
 		gameSpinner: {},
 		
-		// react on start scoring request
+		// react on start/stop scoring gestures
 		init: function(gameID){
 			var self = this;
 			
@@ -266,14 +277,14 @@ var FRISBEE = FRISBEE || {};
 			FRISBEE.myAjax.post(url,gameScore,displayResults);
 			
 			// de score op het scherm updaten na het posten van een score
-			function displayResults(gameScoreRetour){
+			function displayResults(gameScore){
 				// update score
 				var theGame = $('#'+gameID+" .theScore")[0];
-				Transparency.render(theGame, gameScoreRetour, self.gameDirectives());
+				Transparency.render(theGame, gameScore, self.gameDirectives());
 				//remove spinner
 				self.endLongProcess(gameID);
 				// check if game is finished
-				if (gameScoreRetour.is_final) {
+				if (gameScore.is_final) {
 					// tell game it is final
 					$('#'+gameID).addClass("finished");
 					// and back to display mode
@@ -282,7 +293,7 @@ var FRISBEE = FRISBEE || {};
 			};
 		},
 		
-		//start feedback during long process
+		//start game feedback during long process
 		startLongProcess: function(gameID){
 			$("#"+gameID).addClass("busy");
 			this.gameSpinner[gameID] = FRISBEE.utils.spinner.init("small");
@@ -294,7 +305,7 @@ var FRISBEE = FRISBEE || {};
 			this.gameSpinner[gameID].spin(spinTarget);
 		},
 		
-		//end feedback during long process
+		//end game feedback during long process
 		endLongProcess: function(gameID){
 			var spinTarget = $("#"+gameID+" .spinnerContainer")[0];
 			this.gameSpinner[gameID].stop(spinTarget);
@@ -377,28 +388,44 @@ var FRISBEE = FRISBEE || {};
 				},
 				instruction1: {
 					text: function() {
-						if (parseInt(this.team_1_score) == self.WINNINGSCORE-1) {
-							return ("Oeeeh spannend!");
-						} else {
-							return ("Puntje erbij!");
-						}
+						return( composeInstruction(this.team_1_score) );
 					}
 				},
 				instruction2: {
 					text: function() {
-						if (parseInt(this.team_2_score) == self.WINNINGSCORE-1) {
-							return ("Oeeeh spannend!");
-						} else {
-							return ("Puntje erbij!");
-						}
+						return( composeInstruction(this.team_2_score) );
 					}
 				}
 			};
+			
+			function composeInstruction(teamScore) {
+				var instruction;
+						
+				switch(teamScore) {
+					case 0:
+						instruction = "Eerste puntje";
+						break;
+					case 1:
+						instruction = "Tweede puntje";
+						break;
+					case self.WINNINGSCORE-2:
+						instruction = "Oeeeh spannend!";
+						break;
+					case self.WINNINGSCORE-1:
+						instruction = "Matchpoint yeah!";
+						break;
+					default:
+						instruction = "Puntje erbij!";
+				}
+				
+				return (instruction);
+			}			
+			
 			return JSONrules;
-		},
+		}
 	};
 	
-	
+
 	// Ranking - de stand
 	FRISBEE.ranking = {
 		// render the list of pools
@@ -407,6 +434,7 @@ var FRISBEE = FRISBEE || {};
 			var url = FRISBEE.settings.lvGetListOfPools;
 			// start spinning
 			FRISBEE.page.startLongProcess();
+			FRISBEE.page.change();
 			// Get schedule data from LaegueVine
 			FRISBEE.myAjax.get(url,displayResults);
 			
@@ -419,7 +447,7 @@ var FRISBEE = FRISBEE || {};
 				for (var i=0; i < poolList.length; i++){
 					FRISBEE.pool.init(poolList[i].id);
 				}
-				FRISBEE.page.change();
+				$('#poolList').show();
 				FRISBEE.page.endLongProcess();
 			}
 		},
@@ -434,6 +462,8 @@ var FRISBEE = FRISBEE || {};
 		}
 	};
 	
+
+	// Pool - een pool in de Ranking
 	FRISBEE.pool = {
 		init: function(poolID){
 			// sort teams by netto points
@@ -472,7 +502,8 @@ var FRISBEE = FRISBEE || {};
 		}
 	};
 	
-	// utils
+
+	// Utils - functies van algemeen nut
 	FRISBEE.utils = {
 		spinner: {
 			//spinner as part of ajax
@@ -522,6 +553,23 @@ var FRISBEE = FRISBEE || {};
 					spinOpts = this.spinOptsSmall;
 				}
 				return (new Spinner(spinOpts));
+			}
+		},
+		
+		pullToRefresh: {
+			init: function(callback){
+				var container_el = getEl('ptrContainer');
+				var pullrefresh_el = getEl('pullrefresh');
+				var pullrefresh_icon_el = getEl('pullrefresh-icon');
+				// create ptr object
+				var pullToRefresh = new PullToRefresh(container_el, pullrefresh_el, pullrefresh_icon_el);
+				// add ptr function
+				pullToRefresh.handler = function() {
+					//var self = this;
+					//self.slideUp();
+					callback();
+				};
+				return(pullToRefresh);
 			}
 		}
 	};

@@ -146,6 +146,7 @@ article > section.active {
 /* THE SCHEDULE */
 /* gamelist */
 #gameList {
+	display:none;
 }
 
 /* game - container */
@@ -246,6 +247,9 @@ article > section.active {
 }
 
 /* RANKING */
+#poolList {
+	display:none;
+}
 #poolList .pool {
 	padding:1.5em;
 }

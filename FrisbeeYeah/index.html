@@ -5,12 +5,20 @@
 		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
         <title>Frisbee Yeah</title>
         <link rel="stylesheet" href="css/style.css" />
-		<link rel="stylesheet" href="css/ptr.css" />
+		<link rel="stylesheet" href="css/hammer-ptr.css" />
     </head>
-    <body>
+    <body id="ptrContainer">
 		<!-- container voor spinner -->
 		<div id="pageSpinnerContainer" class="spinnerContainer global"></div>
 		
+		<!-- hammer pull to refresh elements -->
+		<div id="pullrefresh">
+			<div class="message">
+				<div id="pullrefresh-icon" class="icon arrow arrow-down"></div>
+				<span></span>
+			</div>
+		</div>
+	
 		<!-- the real stuff -->
 		<header>
 			<h1><span>Tournament: </span>Amsterdam Ultimate Autumn</h1>
@@ -90,22 +98,25 @@
 			
 		</article>
 		
-		<!-- jQuery -->
-		<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
-		<script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
-		<script src="js/libs/jquery.flip.min.js"></script>
-		
 		<!-- Libs -->
+		<script src="js/libs/modernizr.js"></script>
 		<script src="js/libs/routie.min.js"></script>
 		<script src="js/libs/transparancy.min.js"></script>
 		<script src="js/libs/list.min.js"></script>
 		<script src="js/libs/date-utils.min.js"></script>
 		<script src="js/libs/spin.min.js"></script>
+		
+		<!-- hammer -->
 		<script src="js/libs/hammer.min.js"></script>
+		<script src="js/libs/hammer-ptr.js"></script>
+		
+		<!-- jQuery -->
+		<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+		<script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
+		<script src="js/libs/jquery.flip.min.js"></script>
 		
 		<!-- Application -->
 		<script src="js/frisbee.js"></script>
 		<script src="js/libs/myAjax.js"></script>
-		<!-- script src="js/libs/ptr.js"></script -->
 	</body>
 </html>
