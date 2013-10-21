@@ -389,10 +389,10 @@ var FRISBEE = FRISBEE || {};
 				case 1:
 					instruction = "Tweede puntje";
 					break;
-				case self.WINNINGSCORE-2:
+				case this.WINNINGSCORE-2:
 					instruction = "Oeeeh spannend!";
 					break;
-				case self.WINNINGSCORE-1:
+				case this.WINNINGSCORE-1:
 					instruction = "Matchpoint yeah!";
 					break;
 				default:
