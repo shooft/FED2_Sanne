@@ -33,7 +33,7 @@
 		<article>	
 			<section data-route="schedule" id="schedule">
 				<ul id="gameList" data-bind="objects">
-					<li class="game displayMode" data-bind="game">
+					<li data-bind="game">
 						<ul class="gameMeta smallPrint">
 							<li class="startDate" data-bind="startDate"></li>
 							<li class="startTime" data-bind="startTime"></li>
@@ -43,16 +43,16 @@
 						<main class="theScore">
 							<table>
 								<tr>
-									<td class="teamName team1" data-bind="team1Winner">
+									<td data-bind="team1Winner">
 										<div>
 											<span class="theName" data-bind="team1Complete"></span>
 											<span class="instruction smallPrint" data-bind="instruction1">Puntje erbij!</span>
 										</div>
 									</td>
-									<td class="score">
+									<td class="score" data-bind="score">
 										<span class="teamScore team1" data-bind="team_1_score"></span>-<span class="teamScore team2" data-bind="team_2_score"></span>
 									</td>
-									<td class="teamName team2" data-bind="team2Winner">
+									<td data-bind="team2Winner">
 										<div>
 											<span class="theName" data-bind="team2Complete"></span>
 											<span class="instruction smallPrint" data-bind="instruction2">Puntje erbij!</span>
@@ -68,7 +68,7 @@
 			<section data-route="ranking" id="ranking">
 				<ul id="poolList" data-bind="objects">
 					<li class="pool" data-bind="poolID">
-						<main class="theRanking">
+						<section class="theRanking">
 							<table>
 								<thead>
 									<tr>
@@ -91,7 +91,27 @@
 									</tr>
 								</tbody>
 							</table>
-						</main>
+						</section>
+						<section class="theResults">
+							<table>
+								<tbody data-bind="poolResults">
+									<tr>
+										<td data-bind="team1Winner">
+											<span class="theName" data-bind="team1Complete"></span>
+										</td>
+										<td class="score">
+											<span class="teamScore team1" data-bind="team_1_score"></span>-<span class="teamScore team2" data-bind="team_2_score"></span>
+										</td>
+										<td data-bind="team2Winner">
+											<span class="theName" data-bind="team2Complete"></span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</section>
+						<section class="theControls">
+							<a>Show results</a>
+						</section>
 					</li>
 				</ul>
 			</section>

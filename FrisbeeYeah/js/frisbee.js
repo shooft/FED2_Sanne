@@ -14,6 +14,9 @@ var FRISBEE = FRISBEE || {};
 		
 		lvGetListOfGames:'https://api.leaguevine.com/v1/games/?tournament_id=19389&order_by=%5Bid%5D&fields=%5Bid%2Cteam_1_score%2Cteam_2_score%2Cteam_1%2Cteam_2%2Cstart_time%2Cpool%2Cwinner_id%5D&limit=200',
 		
+		// XXXXX needs to replaced by the poolID
+		lvGetListOfPoolGames: 'https://api.leaguevine.com/v1/games/?tournament_id=19389&pool_id=XXXXX&order_by=%5Bid%5D&fields=%5Bid%2Cpool%2Cteam_1%2Cteam_1_score%2Cteam_2%2Cteam_2_score%2Cwinner_id%5D',
+		
 		lvPostGameScore: 'https://api.leaguevine.com/v1/game_scores/',
 		
 		lvGetListOfPools: 'https://api.leaguevine.com/v1/pools/?tournament_id=19389&order_by=%5Bid%5D&fields=%5Bid%2C%20name%2C%20standings%5D&access_token=90073a56bd'
@@ -111,26 +114,25 @@ var FRISBEE = FRISBEE || {};
 	FRISBEE.schedule = {
 		// render the list of games
 		render: function(){
-			var self = this;
 			var url = FRISBEE.settings.lvGetListOfGames;
 			// start spinning
 			FRISBEE.page.startLongProcess();
 			FRISBEE.page.change();
 			// Get schedule data from LaegueVine
-			FRISBEE.myAjax.get(url,displayResults);
-			
-			// Display schedule data om screen
-			function displayResults(games){
-				// ask tranparency to combine data and template
-				Transparency.render($('[data-route=schedule]')[0], games, self.scheduleDirectives());
-				// bind a click event to each game
-				var gameList = $('#gameList .game');
-				for (var i=0; i < gameList.length; i++){
-					FRISBEE.game.init(gameList[i].id);
-				}
-				$('#gameList').show();
-				FRISBEE.page.endLongProcess();
+			FRISBEE.myAjax.get(url,this.displayResults);
+		},
+		
+		// Display schedule data om screen
+		 displayResults: function(games){
+			// ask tranparency to combine data and template
+			Transparency.render($('[data-route=schedule]')[0], games, FRISBEE.schedule.scheduleDirectives());
+			// bind a click event to each game
+			var gameList = $('#gameList .game');
+			for (var i=0; i < gameList.length; i++){
+				FRISBEE.game.init(gameList[i].id);
 			}
+			$('#gameList').show();
+			FRISBEE.page.endLongProcess();
 		},
 		
 		// rules voor schedule pagina
@@ -148,8 +150,6 @@ var FRISBEE = FRISBEE || {};
 	FRISBEE.game = {
 		// winning score
 		WINNINGSCORE: 15,
-		// array of game spinners
-		gameSpinner: {},
 		
 		// react on start/stop scoring gestures
 		init: function(gameID){
@@ -246,7 +246,7 @@ var FRISBEE = FRISBEE || {};
 			var self = this;
 			
 			//add spinner
-			this.startLongProcess(gameID);
+			FRISBEE.utils.spinner.startLongProcess(gameID, "small", "local");
 			
 			// huidige score
 			var team1Score = parseInt($('#'+gameID+' .teamScore.team1').text());
@@ -279,10 +279,10 @@ var FRISBEE = FRISBEE || {};
 			// de score op het scherm updaten na het posten van een score
 			function displayResults(gameScore){
 				// update score
-				var theGame = $('#'+gameID+" .theScore")[0];
-				Transparency.render(theGame, gameScore, self.gameDirectives());
+				var theGameScore = $('#'+gameID+" .theScore")[0];
+				Transparency.render(theGameScore, gameScore, self.gameDirectives());
 				//remove spinner
-				self.endLongProcess(gameID);
+				FRISBEE.utils.spinner.endLongProcess(gameID);
 				// check if game is finished
 				if (gameScore.is_final) {
 					// tell game it is final
@@ -290,28 +290,7 @@ var FRISBEE = FRISBEE || {};
 					// and back to display mode
 					self.editToDisplay(gameID);
 				}
-			};
-		},
-		
-		//start game feedback during long process
-		startLongProcess: function(gameID){
-			$("#"+gameID).addClass("busy");
-			this.gameSpinner[gameID] = FRISBEE.utils.spinner.init("small");
-			// add spinner container
-			$("#"+gameID).prepend('<div id="gameSpinnerContainer'+gameID+'" class="spinnerContainer local"></div>');
-			//spin target
-			var spinTarget = $("#"+gameID+" .spinnerContainer")[0];
-			spinTarget.classList.add('spinning');
-			this.gameSpinner[gameID].spin(spinTarget);
-		},
-		
-		//end game feedback during long process
-		endLongProcess: function(gameID){
-			var spinTarget = $("#"+gameID+" .spinnerContainer")[0];
-			this.gameSpinner[gameID].stop(spinTarget);
-			spinTarget.classList.remove('spinning');
-			$("#"+gameID+" .spinnerContainer").remove();
-			$("#"+gameID).removeClass("busy");
+			};	
 		},
 		
 		// rules voor ranking pagina
@@ -388,41 +367,40 @@ var FRISBEE = FRISBEE || {};
 				},
 				instruction1: {
 					text: function() {
-						return( composeInstruction(this.team_1_score) );
+						return( self.composeInstruction(this.team_1_score) );
 					}
 				},
 				instruction2: {
 					text: function() {
-						return( composeInstruction(this.team_2_score) );
+						return( self.composeInstruction(this.team_2_score) );
 					}
 				}
 			};
-			
-			function composeInstruction(teamScore) {
-				var instruction;
-						
-				switch(teamScore) {
-					case 0:
-						instruction = "Eerste puntje";
-						break;
-					case 1:
-						instruction = "Tweede puntje";
-						break;
-					case self.WINNINGSCORE-2:
-						instruction = "Oeeeh spannend!";
-						break;
-					case self.WINNINGSCORE-1:
-						instruction = "Matchpoint yeah!";
-						break;
-					default:
-						instruction = "Puntje erbij!";
-				}
-				
-				return (instruction);
-			}			
-			
 			return JSONrules;
-		}
+		},
+		
+		composeInstruction: function(teamScore) {
+			var instruction;
+					
+			switch(teamScore) {
+				case 0:
+					instruction = "Eerste puntje";
+					break;
+				case 1:
+					instruction = "Tweede puntje";
+					break;
+				case self.WINNINGSCORE-2:
+					instruction = "Oeeeh spannend!";
+					break;
+				case self.WINNINGSCORE-1:
+					instruction = "Matchpoint yeah!";
+					break;
+				default:
+					instruction = "Puntje erbij!";
+			}
+			
+			return (instruction);
+		}			
 	};
 	
 
@@ -430,26 +408,25 @@ var FRISBEE = FRISBEE || {};
 	FRISBEE.ranking = {
 		// render the list of pools
 		render: function(){
-			var self = this;
 			var url = FRISBEE.settings.lvGetListOfPools;
 			// start spinning
 			FRISBEE.page.startLongProcess();
 			FRISBEE.page.change();
 			// Get schedule data from LaegueVine
-			FRISBEE.myAjax.get(url,displayResults);
-			
-			// Display schedule data om screen
-			function displayResults(pools){
-				// ask tranparency to combine data and template
-				Transparency.render($('[data-route=ranking]')[0], pools, self.rankingDirectives());
-				// sort teams in the pools
-				var poolList = $('#poolList .pool');
-				for (var i=0; i < poolList.length; i++){
-					FRISBEE.pool.init(poolList[i].id);
-				}
-				$('#poolList').show();
-				FRISBEE.page.endLongProcess();
+			FRISBEE.myAjax.get(url,this.displayResults);
+		},
+		
+		// Display schedule data on screen
+		displayResults: function(pools){
+			// ask tranparency to combine data and template
+			Transparency.render($('[data-route=ranking]')[0], pools, FRISBEE.ranking.rankingDirectives());
+			// sort teams in the pools
+			var poolList = $('#poolList .pool');
+			for (var i=0; i < poolList.length; i++){
+				FRISBEE.pool.init(poolList[i].id);
 			}
+			$('#poolList').show();
+			FRISBEE.page.endLongProcess();
 		},
 		
 		// rules voor schedule pagina
@@ -466,10 +443,78 @@ var FRISBEE = FRISBEE || {};
 	// Pool - een pool in de Ranking
 	FRISBEE.pool = {
 		init: function(poolID){
+			var self = this;
 			// sort teams by netto points
 			var options = { valueNames: ['plus_minus'] };
 			var teamList = new List(poolID, options);
 			teamList.sort('plus_minus', { asc: false });
+			// bind event to button
+			$('#'+poolID+' .theControls a').on("click", function(e){
+				self.toggleResults(poolID);
+			});
+			// refresh pool results if displayed
+			if ( $('#'+poolID).hasClass("expandedMode") ) {
+				this.refreshResults(poolID);
+			}
+		},
+		
+		// refresh results for pool
+		refreshResults: function(poolID){
+			this.getResults(poolID, "refresh");
+		},
+		
+		// hide/show results for pool
+		toggleResults: function(poolID){
+			// show results
+			if ( ! $('#'+poolID).hasClass("expandedMode") ) {		
+				this.getResults(poolID, "show");
+			}
+			// hide results
+			else {
+				this.hideResults(poolID);
+			}
+		},
+		
+		// get pool results from LeagueVine
+		getResults: function(poolID, trigger){
+			var self = this;
+			$('#'+poolID+' .theControls a').html("Getting data...");
+			
+			var url = FRISBEE.settings.lvGetListOfPoolGames.replace("XXXXX", poolID);
+			FRISBEE.utils.spinner.startLongProcess(poolID, "small", "local");
+			FRISBEE.myAjax.get(url,displayResults);
+			
+			// display results for pool
+			function displayResults(games){
+				if(trigger == "show") {
+					$('#'+poolID+' .theControls a').html("Sliding down...");
+				}
+				var poolGames = {};
+				poolGames["poolResults"] = [];
+				// filter games that have a winner
+				for (var i=0; i < games.objects.length; i++){
+					if ( games.objects[i].winner_id != null ) {
+						poolGames.poolResults.push ( games.objects[i] );
+					}
+				};
+				
+				// ask tranparency to combine data and template
+				Transparency.render($('#'+poolID+' .theResults')[0], poolGames, FRISBEE.pool.poolResultDirectives());
+				$('#'+poolID).addClass("expandedMode");
+				$('#'+poolID+' .theResults').slideDown(1000, function(){
+					$('#'+poolID+' .theControls a').html("Hide results");
+					FRISBEE.utils.spinner.endLongProcess(poolID);
+				});
+			};
+		},
+		
+		// hide results for pool
+		hideResults: function(poolID) {
+			$('#'+poolID+' .theControls a').html("Sliding up...");
+			$('#'+poolID+' .theResults').slideUp(1000, function(){
+				$('#'+poolID+' .theControls a').html("Show results");
+				$('#'+poolID).removeClass("expandedMode");
+			});
 		},
 		
 		// rules voor pool object
@@ -497,6 +542,15 @@ var FRISBEE = FRISBEE || {};
 						}
 					}
 				}				
+			};
+			return JSONrules;
+		},
+		
+		// rules voor schedule pagina
+		poolResultDirectives: function() {
+			var JSONrules = {		
+				// voor elke game
+				poolResults: FRISBEE.game.gameDirectives()
 			};
 			return JSONrules;
 		}
@@ -545,6 +599,8 @@ var FRISBEE = FRISBEE || {};
 				left: 'auto' // Left position relative to parent in px
 			},
 			
+			spinnerList: {},
+			
 			init: function(size){
 				var spinOpts;
 				if (size == "large") {
@@ -553,7 +609,28 @@ var FRISBEE = FRISBEE || {};
 					spinOpts = this.spinOptsSmall;
 				}
 				return (new Spinner(spinOpts));
-			}
+			},
+			
+			//start feedback during long process
+			startLongProcess: function(objectID, spinnerSize, spinnerScope){
+				$("#"+objectID).addClass("busy");
+				this.spinnerList[objectID] = FRISBEE.utils.spinner.init(spinnerSize);
+				// add spinner container
+				$("#"+objectID).prepend('<div id="spinnerContainer'+objectID+'" class="spinnerContainer '+spinnerScope+'"></div>');
+				//spin target
+				var spinTarget = $("#"+objectID+" .spinnerContainer")[0];
+				spinTarget.classList.add('spinning');
+				this.spinnerList[objectID].spin(spinTarget);
+			},
+			
+			//end feedback during long process
+			endLongProcess: function(objectID){
+				var spinTarget = $("#"+objectID+" .spinnerContainer")[0];
+				this.spinnerList[objectID].stop(spinTarget);
+				spinTarget.classList.remove('spinning');
+				$("#"+objectID+" .spinnerContainer").remove();
+				$("#"+objectID).removeClass("busy");
+			},
 		},
 		
 		pullToRefresh: {
