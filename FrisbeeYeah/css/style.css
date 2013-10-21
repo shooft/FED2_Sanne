@@ -295,13 +295,9 @@ article > section.active {
 	padding:0 0 1.5em;
 }
 
-.theResults table {
-	
-}
-
 .theResults table td {
-	line-height:1.25em;
-	padding:0.5em;
+	line-height:1em;
+	padding:1em 0.5em;
 	background:#f2f2f2;
 }
 
@@ -314,6 +310,13 @@ article > section.active {
 
 .theResults table td.teamName.winner{
 	color:#900;
+	background-image:url(../images/trophy-small-dark.png);
+	background-repeat:no-repeat;
+	background-position:center center;
+}
+
+.theResults table tr:nth-child(even) td.teamName.winner{
+	background-image:url(../images/trophy-small.png);
 }
 
 .theResults table td.score{

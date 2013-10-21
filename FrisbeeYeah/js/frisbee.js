@@ -12,10 +12,10 @@ var FRISBEE = FRISBEE || {};
 	FRISBEE.settings = {
 		lvToken: 'bearer 82996312dc',
 		
-		lvGetListOfGames:'https://api.leaguevine.com/v1/games/?tournament_id=19389&order_by=%5Bid%5D&fields=%5Bid%2Cteam_1_score%2Cteam_2_score%2Cteam_1%2Cteam_2%2Cstart_time%2Cpool%2Cwinner_id%5D&limit=200',
+		lvGetListOfGames:'https://api.leaguevine.com/v1/games/?tournament_id=19389&order_by=%5Bstart_time%5D&fields=%5Bid%2Cteam_1_score%2Cteam_2_score%2Cteam_1%2Cteam_2%2Cstart_time%2Cpool%2Cwinner_id%5D&limit=200',
 		
 		// XXXXX needs to replaced by the poolID
-		lvGetListOfPoolGames: 'https://api.leaguevine.com/v1/games/?tournament_id=19389&pool_id=XXXXX&order_by=%5Bid%5D&fields=%5Bid%2Cpool%2Cteam_1%2Cteam_1_score%2Cteam_2%2Cteam_2_score%2Cwinner_id%5D',
+		lvGetListOfPoolGames: 'https://api.leaguevine.com/v1/games/?tournament_id=19389&pool_id=XXXXX&order_by=%5Bstart_time%5D&fields=%5Bid%2Cpool%2Cteam_1%2Cteam_1_score%2Cteam_2%2Cteam_2_score%2Cwinner_id%5D',
 		
 		lvPostGameScore: 'https://api.leaguevine.com/v1/game_scores/',
 		
