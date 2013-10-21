@@ -52,7 +52,6 @@ body{
 
 .spinnerContainer.local {
 	position:absolute;
-	background:rgba(255,255,255,0.5);
 }
 
 .spinnerContainer.spinning {
@@ -336,6 +335,11 @@ article > section.active {
 	color:white;
 	background:#900;
 	cursor:pointer;
+}
+
+.busy .theControls a {
+	background:#999;
+	color:#ccc;	
 }
 
 

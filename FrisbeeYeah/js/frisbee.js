@@ -486,9 +486,6 @@ var FRISBEE = FRISBEE || {};
 			
 			// display results for pool
 			function displayResults(games){
-				if(trigger == "show") {
-					$('#'+poolID+' .theControls a').html("Sliding down...");
-				}
 				var poolGames = {};
 				poolGames["poolResults"] = [];
 				// filter games that have a winner
@@ -501,9 +498,12 @@ var FRISBEE = FRISBEE || {};
 				// ask tranparency to combine data and template
 				Transparency.render($('#'+poolID+' .theResults')[0], poolGames, FRISBEE.pool.poolResultDirectives());
 				$('#'+poolID).addClass("expandedMode");
+				FRISBEE.utils.spinner.endLongProcess(poolID);
+				if(trigger == "show") {
+					$('#'+poolID+' .theControls a').html("Sliding down...");
+				}
 				$('#'+poolID+' .theResults').slideDown(1000, function(){
 					$('#'+poolID+' .theControls a').html("Hide results");
-					FRISBEE.utils.spinner.endLongProcess(poolID);
 				});
 			};
 		},
