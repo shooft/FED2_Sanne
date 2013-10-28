@@ -221,6 +221,10 @@ article > section.active {
 	line-height:1.1em;
 }
 
+.myTeam {
+	font-weight:bold;
+}
+
 #gameList .game.editMode .theScore td.teamName div .theName {
 	color:#fff;
 }

@@ -81,7 +81,7 @@
 									</tr>
 								</thead>
 								<tbody data-bind="standings" class="list">
-									<tr>
+									<tr data-bind="teamRanking">
 										<td class="teamName" data-bind="teamName"></td>
 										<td class="wins" data-bind="wins"></td>
 										<td class="losses" data-bind="losses"></td>
@@ -133,6 +133,7 @@
 		<!-- jQuery -->
 		<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
 		<script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
+		<script src="js/libs/jquery.cookie.js"></script>
 		<script src="js/libs/jquery.flip.min.js"></script>
 		
 		<!-- Application -->

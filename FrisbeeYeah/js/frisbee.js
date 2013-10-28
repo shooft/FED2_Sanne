@@ -26,6 +26,9 @@ var FRISBEE = FRISBEE || {};
 	// Controller Init
 	FRISBEE.controller = {
 		init: function () {
+			if (Modernizr.localstorage) {
+				localStorage.myTeamID="21201";
+			}
 			// Initialize page
 			FRISBEE.page.init();
 			// Initialize router
@@ -355,6 +358,13 @@ var FRISBEE = FRISBEE || {};
 					},
 					id: function() {
 						return (this.team_1_id);
+					},
+					class: function() {
+						var teamClass = "theName";
+						if (this.team_1_id == localStorage.myTeamID) {
+							teamClass = teamClass + " myTeam";
+						}
+						return(teamClass);
 					}
 				},
 				team2Complete: {
@@ -363,6 +373,13 @@ var FRISBEE = FRISBEE || {};
 					},
 					id: function() {
 						return (this.team_2_id);
+					},
+					class: function() {
+						var teamClass = "theName";
+						if (this.team_2_id == localStorage.myTeamID) {
+							teamClass = teamClass + " myTeam";
+						}
+						return(teamClass);
 					}
 				},
 				instruction1: {
@@ -536,12 +553,24 @@ var FRISBEE = FRISBEE || {};
 				
 				//teamName
 				standings: {
+					teamRanking: {
+						class: function() {
+							if (this.team.id == localStorage.myTeamID) {
+								return ("myTeam");
+							}
+							else {
+								return("");
+							}
+						}
+						
+					},
+					
 					teamName: {
 						text: function() {
 							return (this.team.name);
 						}
 					}
-				}				
+				}		
 			};
 			return JSONrules;
 		},

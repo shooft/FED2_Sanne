@@ -13,6 +13,12 @@
 			xhr.send();
 		},
 		
+		del: function(url,callback){
+			var xhr = this.createAndOpenRequest('DELETE', url, callback);
+			// Send request
+			xhr.send();
+		},
+		
 		createAndOpenRequest: function(type, url, callback){
 			var self = this;
 			
@@ -31,14 +37,26 @@
 				if(xhr.readyState < 4) {
 					return;
 				}  
-				if(xhr.status !== 200 && xhr.status !== 201) {
-					FRISBEE.page.endLongProcess();
-					return;
-				}
-				// all is well    
+				
 				if(xhr.readyState === 4) {
-					// return JSON as JSON object
-					callback(JSON.parse(xhr.response));
+					if(xhr.status == 200 && type == "GET") {
+						// return JSON as JSON object
+						callback(JSON.parse(xhr.response));
+					}
+					
+					else if (xhr.status == 201 && type == "POST") {
+						// return JSON as JSON object
+						callback(JSON.parse(xhr.response));
+					}
+					
+					else if (xhr.status == 204 && type == "DELETE") {
+						// return JSON as JSON object
+						callback(xhr);
+					}
+					
+					else {
+						return;
+					} 
 				}
 			};
 			
