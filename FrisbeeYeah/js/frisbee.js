@@ -14,21 +14,22 @@ var FRISBEE = FRISBEE || {};
 		
 		lvGetListOfGames:'https://api.leaguevine.com/v1/games/?tournament_id=19389&order_by=%5Bstart_time%5D&fields=%5Bid%2Cteam_1_score%2Cteam_2_score%2Cteam_1%2Cteam_2%2Cstart_time%2Cpool%2Cwinner_id%5D&limit=200',
 		
+		lvPostGameScore: 'https://api.leaguevine.com/v1/game_scores/',
+		
+		lvGetListOfPools: 'https://api.leaguevine.com/v1/pools/?tournament_id=19389&order_by=%5Bid%5D&fields=%5Bid%2C%20name%2C%20standings%5D&access_token=90073a56bd',
+		
 		// XXXXX needs to replaced by the poolID
 		lvGetListOfPoolGames: 'https://api.leaguevine.com/v1/games/?tournament_id=19389&pool_id=XXXXX&order_by=%5Bstart_time%5D&fields=%5Bid%2Cpool%2Cteam_1%2Cteam_1_score%2Cteam_2%2Cteam_2_score%2Cwinner_id%5D',
 		
-		lvPostGameScore: 'https://api.leaguevine.com/v1/game_scores/',
-		
-		lvGetListOfPools: 'https://api.leaguevine.com/v1/pools/?tournament_id=19389&order_by=%5Bid%5D&fields=%5Bid%2C%20name%2C%20standings%5D&access_token=90073a56bd'
+		lvGetListOfTeams:'https://api.leaguevine.com/v1/teams/?season_id=20167&order_by=%5Bname%5D&fields=%5Bid%2Cname%5D'
 	};
 	
 	
 	// Controller Init
 	FRISBEE.controller = {
 		init: function () {
-			if (Modernizr.localstorage) {
-				localStorage.myTeamID="21201";
-			}
+			// Initialize me
+			FRISBEE.me.init();
 			// Initialize page
 			FRISBEE.page.init();
 			// Initialize router
@@ -54,13 +55,9 @@ var FRISBEE = FRISBEE || {};
 	
 	// Page - de baas over de algemene dingen van de pagina
 	FRISBEE.page = {
-		pageSpinTarget: document.getElementById('pageSpinnerContainer'),
-		pageSpinner: {},
 		pullToRefresh:{},
 			
 		init: function(){
-			// Initialize spinner
-			this.pageSpinner = FRISBEE.utils.spinner.init("large");
 			// Initialize pull to refresh
 			this.pullToRefresh = FRISBEE.utils.pullToRefresh.init(this.refreshPage);
 		},
@@ -75,6 +72,11 @@ var FRISBEE = FRISBEE || {};
 			else if (route == "ranking") {
 				FRISBEE.ranking.render();
 			}
+			// data voor de stand ophalen en invoegen
+			else if (route == "me") {
+				FRISBEE.me.render();
+			}
+			
 		},
 		
 		// refresh the content of the page
@@ -98,17 +100,12 @@ var FRISBEE = FRISBEE || {};
 			$( "nav a[href='#/"+route+"']" ).addClass('active');
 		},
 		
-		// start feedback during long process
-		startLongProcess: function(){
-			this.pageSpinTarget.classList.add('spinning');
-			this.pageSpinner.spin(this.pageSpinTarget);
+		startLongProcess: function() {
+			FRISBEE.utils.spinner.startLongProcess("ptrContainer", "large", "global");
 		},
 		
-		// end feedback during long process
-		endLongProcess: function(){
-			this.pageSpinner.stop(this.pageSpinTarget);
-			this.pageSpinTarget.classList.remove('spinning');
-			
+		endLongProcess: function() {
+			FRISBEE.utils.spinner.endLongProcess("ptrContainer");
 		}
 	}
 	
@@ -135,6 +132,7 @@ var FRISBEE = FRISBEE || {};
 				FRISBEE.game.init(gameList[i].id);
 			}
 			$('#gameList').show();
+			//FRISBEE.page.endLongProcess();
 			FRISBEE.page.endLongProcess();
 		},
 		
@@ -181,53 +179,65 @@ var FRISBEE = FRISBEE || {};
 				// determine current mode
 				if ( $('#'+gameID).hasClass('editMode') ) {
 					gameMode = "editMode";
-					flipDirection = "lr";
-				} else {
+					flipDirection = "right";
+				}
+				else {
 					gameMode = "displayMode";
-					flipDirection = "rl";
+					flipDirection = "left";
 				}
 				
 				// determine flip direction based on the event type
 				if ( eventType == "swipeleft") {
-					flipDirection = "rl";
-				} else if ( eventType == "swiperight") {
-					flipDirection = "lr";
+					flipDirection = "left";
+				}
+				else if ( eventType == "swiperight") {
+					flipDirection = "right";
 				}
 				
 				// flip the game
-				$("#"+gameID).flip({
+				$("#"+gameID+" > div").flippy({
 					direction:flipDirection,
-					color:"#fff",
-					onAnimation: function(){
-						// go to edit mode		
+					color_target:"#fff",
+					duration:1000,
+					verso: $("#"+gameID+" > div").html(),
+					onStart:  function(){
+						$('#'+gameID).css({'z-index':'1000'});
+					},
+					onMidway: function(){
+						self.changeMode(gameID);
+					},
+					onFinish: function(){
+						// handle the events		
 						if ( gameMode == "displayMode" ){
-							self.displayToEdit(gameID);
+							self.bindScroreEvents(gameID);
 						}
 						// go back to display mode
 						else {
-							self.editToDisplay(gameID);
+							self.unbindScoreEvents(gameID);
 						}
-					},
-					onEnd: function(){
-						$('#'+gameID).attr("style","");
+						// remove inline style trash
+						$('#'+gameID).css({'z-index':"auto"});
+						$('#'+gameID+' > div').attr("style","");
 					}
 					
 				})
 			}
 		},
 		
-		displayToEdit: function(gameID){
+		changeMode: function(gameID){
+			$('#'+gameID).toggleClass('displayMode').toggleClass('editMode');
+		},
+		
+		bindScroreEvents: function(gameID){
 			var self = this;
-			$('#'+gameID).removeClass('displayMode').addClass('editMode');
-							
 			// add event to buttons	
-			$( "#"+gameID+" .theScore .teamName" ).on("click", function(e) {
+			$( "#"+gameID+" .theScore .teamName div" ).on("click", function(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				// determine game ID and team number of scoring team
 				var gameID = $(this).closest(".game")[0].id;
 				var teamNumber;
-				if ($(this).hasClass("team1")){
+				if ($(this).parent().hasClass("team1")){
 					teamNumber = 1;
 				} else {
 					teamNumber = 2;
@@ -237,11 +247,9 @@ var FRISBEE = FRISBEE || {};
 			});
 		},
 		
-		editToDisplay: function(gameID){
-			// game from edit to display
-			$('#'+gameID).removeClass('editMode').addClass('displayMode');
+		unbindScoreEvents: function(gameID){
 			// unbind event from buttons
-			$( "#"+gameID+" .theScore .teamName" ).off();
+			$( "#"+gameID+" .theScore .teamName div" ).off();
 		},
 		
 		// een score voor een game doorgeven aan LeagueVine
@@ -249,7 +257,7 @@ var FRISBEE = FRISBEE || {};
 			var self = this;
 			
 			//add spinner
-			FRISBEE.utils.spinner.startLongProcess(gameID, "small", "local");
+			self.startLongProcess(gameID);
 			
 			// huidige score
 			var team1Score = parseInt($('#'+gameID+' .teamScore.team1').text());
@@ -285,15 +293,23 @@ var FRISBEE = FRISBEE || {};
 				var theGameScore = $('#'+gameID+" .theScore")[0];
 				Transparency.render(theGameScore, gameScore, self.gameDirectives());
 				//remove spinner
-				FRISBEE.utils.spinner.endLongProcess(gameID);
+				self.endLongProcess(gameID);
 				// check if game is finished
 				if (gameScore.is_final) {
 					// tell game it is final
 					$('#'+gameID).addClass("finished");
 					// and back to display mode
-					self.editToDisplay(gameID);
+					self.changeMode(gameID);
 				}
 			};	
+		},
+		
+		startLongProcess: function(gameID) {
+			FRISBEE.utils.spinner.startLongProcess(gameID, "small", "local");
+		},
+		
+		endLongProcess: function(gameID) {
+			FRISBEE.utils.spinner.endLongProcess(gameID);
 		},
 		
 		// rules voor ranking pagina
@@ -308,9 +324,9 @@ var FRISBEE = FRISBEE || {};
 					},
 					class: function() {
 						if( this.winner_id != null){
-							return("game displayMode finished");
+							return("game flipbox-container displayMode finished");
 						} else {
-							return("game displayMode");
+							return("game flipbox-container displayMode");
 						}
 					}
 				},
@@ -407,10 +423,10 @@ var FRISBEE = FRISBEE || {};
 					instruction = "Tweede puntje";
 					break;
 				case this.WINNINGSCORE-2:
-					instruction = "Oeeeh spannend!";
+					instruction = "Oeh spannend!";
 					break;
 				case this.WINNINGSCORE-1:
-					instruction = "Matchpoint yeah!";
+					instruction = "Matchpoint!!!";
 					break;
 				default:
 					instruction = "Puntje erbij!";
@@ -465,13 +481,15 @@ var FRISBEE = FRISBEE || {};
 			var options = { valueNames: ['plus_minus'] };
 			var teamList = new List(poolID, options);
 			teamList.sort('plus_minus', { asc: false });
-			// bind event to button
-			$('#'+poolID+' .theControls a').on("click", function(e){
-				self.toggleResults(poolID);
-			});
 			// refresh pool results if displayed
-			if ( $('#'+poolID).hasClass("expandedMode") ) {
+			if ( $('#'+poolID+' .theResults').hasClass("shown") ) {
 				this.refreshResults(poolID);
+			}
+			// bind event to button
+			else {
+				$('#'+poolID+' .theControls a').off().on("click", function(e){
+					self.toggleResults(poolID);
+				});
 			}
 		},
 		
@@ -483,7 +501,7 @@ var FRISBEE = FRISBEE || {};
 		// hide/show results for pool
 		toggleResults: function(poolID){
 			// show results
-			if ( ! $('#'+poolID).hasClass("expandedMode") ) {		
+			if ( ! $('#'+poolID+' .theResults').hasClass("shown") ) {		
 				this.getResults(poolID, "show");
 			}
 			// hide results
@@ -498,7 +516,7 @@ var FRISBEE = FRISBEE || {};
 			$('#'+poolID+' .theControls a').html("Getting data...");
 			
 			var url = FRISBEE.settings.lvGetListOfPoolGames.replace("XXXXX", poolID);
-			FRISBEE.utils.spinner.startLongProcess(poolID, "small", "local");
+			self.startLongProcess(poolID);
 			FRISBEE.myAjax.get(url,displayResults);
 			
 			// display results for pool
@@ -514,24 +532,40 @@ var FRISBEE = FRISBEE || {};
 				
 				// ask tranparency to combine data and template
 				Transparency.render($('#'+poolID+' .theResults')[0], poolGames, FRISBEE.pool.poolResultDirectives());
-				$('#'+poolID).addClass("expandedMode");
-				FRISBEE.utils.spinner.endLongProcess(poolID);
-				if(trigger == "show") {
-					$('#'+poolID+' .theControls a').html("Sliding down...");
-				}
-				$('#'+poolID+' .theResults').slideDown(1000, function(){
-					$('#'+poolID+' .theControls a').html("Hide results");
-				});
+				
+				// wait a little little for tranparency to finish
+				setTimeout(function(){
+					
+					if(trigger == "show") {
+						$('#'+poolID+' .theControls a').html("Sliding down...");
+					}
+					$('#'+poolID+' .theResults').addClass("shown");
+					
+					setTimeout(function(){
+						self.endLongProcess(poolID);
+						$('#'+poolID+' .theControls a').html("Hide results");
+					},500);
+				
+				},100);
 			};
 		},
 		
 		// hide results for pool
 		hideResults: function(poolID) {
 			$('#'+poolID+' .theControls a').html("Sliding up...");
-			$('#'+poolID+' .theResults').slideUp(1000, function(){
+			$('#'+poolID+' .theResults').removeClass("shown");
+			
+			setTimeout(function(){
 				$('#'+poolID+' .theControls a').html("Show results");
-				$('#'+poolID).removeClass("expandedMode");
-			});
+			},800);
+		},
+		
+		startLongProcess: function(poolID) {
+			FRISBEE.utils.spinner.startLongProcess(poolID, "small", "local");
+		},
+		
+		endLongProcess: function(poolID) {
+			FRISBEE.utils.spinner.endLongProcess(poolID);
 		},
 		
 		// rules voor pool object
@@ -585,8 +619,98 @@ var FRISBEE = FRISBEE || {};
 		}
 	};
 	
+	
+	// MY SETTINGS - preferences for the user - for now only my team
+	FRISBEE.me = {
+		// init my prefs
+		init: function(){
+			if (Modernizr.localstorage) {
+				if (localStorage.getItem("myTeamID") === null) {	
+					localStorage.myTeamID = "allTeams";
+				}
+			}
+		},
+		
+		// render the prefs
+		render: function(){
+			FRISBEE.page.change();
+			
+			if (Modernizr.localstorage) {
+				if (localStorage.getItem("teams") === null) {	
+					var url = FRISBEE.settings.lvGetListOfTeams;
+					// start spinning
+					FRISBEE.page.startLongProcess();
+					// Get schedule data from LaegueVine
+					FRISBEE.myAjax.get(url,this.displayResults);
+				}
+				else {
+					this.renderResults(localStorage.teams);
+				}
+			}
+		},
+		
+		displayResults: function(teams){
+			// store teams in local storage
+			localStorage.teams = JSON.stringify(teams.objects);
+			
+			FRISBEE.me.renderResults(localStorage.teams);
+			FRISBEE.page.endLongProcess();
+		},
+		
+		renderResults: function(teams){
+			var teamList = {};
+			teamList["teams"] = JSON.parse(teams);
+			
+			// ask tranparency to combine data and template
+			Transparency.render($('[data-route=me]')[0], teamList, FRISBEE.me.meDirectives());
+			var teamList = $("#me li");
+			for (var i=0; i < teamList.length; i++){
+				FRISBEE.team.init(teamList[i].id);
+			}
+			
+			$("#me li").removeClass("active");
+			$("#me #team"+localStorage.myTeamID).addClass("active");
+			
+			$("#me ul").show();
+		},
+		
+		// rules voor team list
+		meDirectives: function() {
+			var JSONrules = {		
+				teams: FRISBEE.team.teamDirectives()
+			};
+			return JSONrules;
+		}
+	};
+	
+	FRISBEE.team = {
+		init: function(teamID) {
+			$("#"+teamID).off().on("click", function(){
+				localStorage.myTeamID = teamID.substr(4);
+				$("#me li").removeClass("active");
+				$("#me #"+teamID).addClass("active");
+			});
+		},
+		
+		// rules voor team
+		teamDirectives: function() {
+			var JSONrules = {		
+				//team
+				teamInList: {
+					id: function() {
+						return ("team"+this.id);
+					},
+					text: function() {
+						return (this.name);
+					}
+				}				
+			};
+			return JSONrules;
+		}
+	};
 
-	// Utils - functies van algemeen nut
+
+	// UTILS - functies van algemeen nut
 	FRISBEE.utils = {
 		spinner: {
 			//spinner as part of ajax
@@ -657,7 +781,7 @@ var FRISBEE = FRISBEE || {};
 				var spinTarget = $("#"+objectID+" .spinnerContainer")[0];
 				this.spinnerList[objectID].stop(spinTarget);
 				spinTarget.classList.remove('spinning');
-				$("#"+objectID+" .spinnerContainer").remove();
+				$("#"+objectID+" > .spinnerContainer").remove();
 				$("#"+objectID).removeClass("busy");
 			},
 		},

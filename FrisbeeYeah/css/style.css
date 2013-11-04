@@ -24,13 +24,14 @@ a{text-decoration:none}
 b,strong{font-weight:bold}
 i,em{font-style:italic}
 
+/* CONTAINER */
 html{
 	height:100%;
-	background:#ddd;
+	background:#fff;
 }
 body{
 	position:relative;
-	font-family:Tahoma, Geneva, sans-serif;
+	font-family:Arial, Helvetica, sans-serif;
     font-size:90%;
     line-height:150%;
 	height:100%;
@@ -61,14 +62,7 @@ body{
 
 /* BASIC ELEMENTS */
 h1 {
-	font-size:150%;
-	color:white;
-	width:60%;
-	padding:0.25em 0.5em;
-}
-h1 span {
-	font-size:50%;
-	display:block;
+	font-size:1.25em;
 }
 
 h2 {
@@ -91,44 +85,56 @@ table {
 article > section > ul > li {
 	position:relative;
 	background:#fff;
-	border-bottom:dotted 1px #ccc;
+	border-bottom:solid 1px #eee;
 }
 
 
 /* HEADER */
 body > header{
-	position:relative;
-	background:#5f6e33 url(../images/dog-with-frisbee.png) no-repeat top right;
-	height:9em;
+	padding:0.5em;
+	text-align:center;
+	background:#f5f5f5;
+	border-bottom:solid 1px #ccc;
+}
+
+body > header h1{
+	padding:0.25em 0 0.5em;
 }
 
 /* Menu */
 nav {
-	position:absolute;
-	bottom:0;
-	width:100%;
+	
 }
-nav ol {
-	text-align: center;
+nav ul {
+	
 }
 nav li {
 	display:inline-block;
-	width:50%;
+	width:33.334%;
 }
 nav a {
 	display:block;
-	padding:0.75em;
-	background:rgba(255,255,255,0.1);
-	color:rgba(255,255,255,0.5);
+	padding:0.25em;
+	color:#690;
+	border:solid 1px #690;
+	border-left:none;
+	
 }
-nav a:hover{
-	background:rgba(0,0,0,0.1);
-	color:rgba(255,255,255,0.75);
+nav li:first-child a{
+	border-left:solid 1px #690;
+	-webkit-border-radius:0.25em 0 0 0.25em;
+	border-radius:0.25em 0 0 0.25em;
 }
+
+nav li:last-child a{
+	-webkit-border-radius:0 0.25em 0.25em 0;
+	border-radius:0 0.25em 0.25em 0;
+}
+
 nav .active,
 nav .active:hover {
-	background:rgba(0,0,0,0.25);
-	color:rgba(255,255,255,1);
+	background:#690;
+	color:#fff;
 }
 
 /* THE PAGE (ARTICLE) */
@@ -152,6 +158,7 @@ article > section.active {
 /* game - container */
 #gameList .game {
 	text-align:center;
+	position:relative;
 }
 
 #gameList .game.displayMode {
@@ -159,8 +166,8 @@ article > section.active {
 }
 
 #gameList .game.finished {
-	background:#f2f2f2;
 	cursor:default;
+	background:#f5f5f5;
 }
 
 /* game - meta */
@@ -174,14 +181,17 @@ article > section.active {
 	color:#999;
 }
 
-#gameList .game.editMode .gameMeta li,
+#gameList .game.editMode .gameMeta li {
+	color:#eee;
+}
+
 #gameList .game.finished .gameMeta li {
-	color:#ccc;
+	color:#ddd;
 }
 
 /* game - score */
 #gameList .game .theScore {
-	padding:1em;
+	padding:0 1em 1em;
 }
 
 #gameList .game .theScore td {
@@ -190,38 +200,42 @@ article > section.active {
 
 /* game - score - score */
 #gameList .game .theScore td.score {
-	height:3.2em;
 	width:26%;
-	padding:0 0 1em;
+	padding:1.25em 0 1em;
 	font-size:1.5em;
 }
 
 /* game - score - names */
 #gameList .game .theScore td.teamName {
-	height:4em;
+	height:6.5em;
 	width:37%;
-	padding:0 0.5em 1.25em;
-}
-
-#gameList .game.editMode .theScore td.teamName {
-	background:#910;
-	cursor:pointer;
-}
-
-#gameList .game.finished .theScore td.teamName.winner {
-	background:url(../images/trophy.png) no-repeat center top;
+	padding:0 0.5em;
 }
 
 #gameList .game .theScore td.teamName div {
 	position:relative;
+	padding:0.35em 0.5em 0.8em;
+}
+
+#gameList .game.editMode .theScore td.teamName div {
+	cursor:pointer;
+	background:#690;
+	-webkit-border-radius:0.25em;
+	border-radius:0.25em;
+}
+
+#gameList .game.finished .theScore td.teamName.winner {
+	background:url(../images/trophy.png) no-repeat center center;
 }
 
 #gameList .game .theScore td.teamName div .theName {
 	display:block;
 	line-height:1.1em;
+	padding:0.8em 0 0;
 }
 
-.myTeam {
+#gameList .game .theScore td.teamName div .theName.myTeam {
+	background:url(../images/kroontje.png) no-repeat center top;
 	font-weight:bold;
 }
 
@@ -230,11 +244,19 @@ article > section.active {
 }
 
 #gameList .game .theScore td.teamName.winner div .theName {
-	color:#900;
+	color:#690;
+}
+
+#gameList .game.editMode .theScore td.teamName div .theName.myTeam {
+	background-image:url(../images/kroontje-wit.png);
 }
 
 #gameList .game.editMode .theScore td.teamName.winner div .theName {
 	color:#fc0;
+}
+
+#gameList .game.editMode .theScore td.teamName.winner div .theName.myTeam {
+	background-image:url(../images/kroontje-geel.png);
 }
 
 /* game - score - names - insctruction */
@@ -244,9 +266,6 @@ article > section.active {
 
 #gameList .game.editMode .theScore td.teamName div .instruction {
 	display:block;
-	position:absolute;
-	bottom:-1.5em;
-	width:100%;
 	color:rgba(255,255,255,0.5);
 }
 
@@ -257,73 +276,113 @@ article > section.active {
 
 /* POOL */
 #poolList .pool {
-	padding:1.5em;
+	padding:2em 1.5em 1.5em;
+}
+
+.pool tr.myTeam td:first-child{
+	background-image:url(../images/kroontje.png);
+	background-repeat:no-repeat;
+	background-position:1.5em 0.25em;
+	background-size:12px 9px;
+}
+
+.pool tr:nth-child(odd) td {
+	background:#f8f8f8;
+}
+
+.pool tr:nth-child(even) td {
+	background:#f2f2f2;
+}
+
+.pool th,
+.pool td {
+	line-height:1.1em;
+	padding:0.75em 0.25em;
+	text-align:center;
 }
 
 /* pool - ranking*/
 .theRanking {
 	padding:0 0 1.5em;
 }
+
 .theRanking th,
 .theRanking td {
 	width:13%;
 	line-height:1.25em;
-	padding:0.5em 0.5em 0.5em 0;
-	text-align:center;
 }
 
 .theRanking td:first-child,
 .theRanking th:first-child {
 	width:35%;
-	padding-left:0.75em;
 	text-align:left;
+	padding-left:0.75em;
 }
 
 .theRanking th {
-	color:#999;
+	color:#ccc;
 }
 
-.theRanking td {
-	background:#f2f2f2;
-}
-
-.theRanking tr:nth-child(even) td {
-	background:#f8f8f8;
+.theRanking .myTeam {
+	font-weight:bold;
 }
 
 /* pool - results */
 .theResults {
 	text-align:center;
-	display:none;
-	padding:0 0 1.5em;
+	padding:0;
+	
+    overflow: hidden;
+	max-height:0;
+    
+	-moz-transition:max-height 1s, padding 0.75s;
+    -webkit-transition:max-height 1s, padding 0.75s;
+    -o-transition:max-height 1s, padding 0.75s;
+    transition:max-height 1s, padding 0.75s;
+	
+	-moz-transition-timing-function:ease;
+	-webkit-transition-timing-function:ease;
+	-o-transition-timing-function:ease;
+	transition-timing-function:ease;
 }
 
-.theResults table td {
-	line-height:1em;
-	padding:1em 0.5em;
-	background:#f2f2f2;
+.theResults.shown {
+    padding:0 0 1.5em;
+    max-height:40em;
 }
 
-.theResults table tr:nth-child(even) td {
-	background:#f8f8f8;
+.theResults td {
+	padding:0 0.25em;
 }
-.theResults table td.teamName{
+
+.theResults td.teamName{
 	width:41%;
 }
 
-.theResults table td.teamName.winner{
-	color:#900;
+.theResults td.teamName.winner{
+	color:#690;
 	background-image:url(../images/trophy-small-dark.png);
 	background-repeat:no-repeat;
 	background-position:center center;
 }
 
-.theResults table tr:nth-child(even) td.teamName.winner{
+.theResults tr:nth-child(odd) td.teamName.winner{
 	background-image:url(../images/trophy-small.png);
 }
 
-.theResults table td.score{
+.theResults td.score{
 	width:18%;
+	font-weight:bold;
+}
+
+.theResults .theName {
+	display:block;
+	padding:1em 0.5em;
+}
+
+.theResults .myTeam {
+	background:url(../images/kroontje.png) no-repeat center 0.375em;
+	background-size:12px 9px;
 	font-weight:bold;
 }
 
@@ -335,9 +394,11 @@ article > section.active {
 .theControls a {
 	display:inline-block;
 	width:50%;
-	padding:0.75em 0;
+	padding:0.5em 0;
 	color:white;
-	background:#900;
+	background:#690;
+	-webkit-border-radius:0.25em;
+	border-radius:0.25em;
 	cursor:pointer;
 }
 
@@ -346,24 +407,18 @@ article > section.active {
 	color:#ccc;	
 }
 
+/* MY TEAM */
+#me ul {
+	display:none;
+}
 
+#me li {
+	padding:1.25em 1.25em 1.25em 3em;
+	background:url(../images/radio.png) no-repeat 0.75em center;
+	background-size:1.6666666667em 1.6666666667em;
+	cursor:pointer;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#me li.active {
+	background-image:url(../images/radio-checked.png);
+}

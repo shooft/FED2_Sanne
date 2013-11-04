@@ -9,7 +9,7 @@
     </head>
     <body id="ptrContainer">
 		<!-- container voor spinner -->
-		<div id="pageSpinnerContainer" class="spinnerContainer global"></div>
+		<!--div id="pageSpinnerContainer" class="spinnerContainer global"></div-->
 		
 		<!-- hammer pull to refresh elements -->
 		<div id="pullrefresh">
@@ -21,12 +21,11 @@
 	
 		<!-- the real stuff -->
 		<header>
-			<h1><span>Tournament: </span>Amsterdam Ultimate Autumn</h1>
+			<h1>Amsterdam Ultimate Autumn</h1>
 			<nav>
-				<ol>
-					<li><a href="#/schedule">The Schedule</a></li><li><a href="#/ranking">The Ranking</a></li>
-				   
-				</ol>
+				<ul>
+					<li><a href="#/schedule">The Schedule</a></li><li><a href="#/ranking">The Ranking</a></li><li><a href="#/me">My Team</a></li>
+				</ul>
 			</nav>
 		</header>
 		
@@ -34,33 +33,35 @@
 			<section data-route="schedule" id="schedule">
 				<ul id="gameList" data-bind="objects">
 					<li data-bind="game">
-						<ul class="gameMeta smallPrint">
-							<li class="startDate" data-bind="startDate"></li>
-							<li class="startTime" data-bind="startTime"></li>
-							<li class="pitch">Field D</li>
-							<li class="pool" data-bind="pool"></li>
-						</ul>
-						<main class="theScore">
-							<table>
-								<tr>
-									<td data-bind="team1Winner">
-										<div>
-											<span class="theName" data-bind="team1Complete"></span>
-											<span class="instruction smallPrint" data-bind="instruction1">Puntje erbij!</span>
-										</div>
-									</td>
-									<td class="score" data-bind="score">
-										<span class="teamScore team1" data-bind="team_1_score"></span>-<span class="teamScore team2" data-bind="team_2_score"></span>
-									</td>
-									<td data-bind="team2Winner">
-										<div>
-											<span class="theName" data-bind="team2Complete"></span>
-											<span class="instruction smallPrint" data-bind="instruction2">Puntje erbij!</span>
-										</div>
-									</td>
-								</tr>
-							</table>
-						</main>
+						<div>
+							<ul class="gameMeta smallPrint">
+								<li class="startDate" data-bind="startDate"></li>
+								<li class="startTime" data-bind="startTime"></li>
+								<li class="pitch">Field D</li>
+								<li class="pool" data-bind="pool"></li>
+							</ul>
+							<main class="theScore">
+								<table>
+									<tr>
+										<td data-bind="team1Winner">
+											<div>
+												<span class="theName" data-bind="team1Complete"></span>
+												<span class="instruction smallPrint" data-bind="instruction1">Puntje erbij!</span>
+											</div>
+										</td>
+										<td class="score" data-bind="score">
+											<span class="teamScore team1" data-bind="team_1_score"></span>-<span class="teamScore team2" data-bind="team_2_score"></span>
+										</td>
+										<td data-bind="team2Winner">
+											<div>
+												<span class="theName" data-bind="team2Complete"></span>
+												<span class="instruction smallPrint" data-bind="instruction2">Puntje erbij!</span>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</main>
+						</div>
 					</li>
 				</ul>
 			</section>
@@ -116,6 +117,17 @@
 				</ul>
 			</section>
 			
+			<section data-route="me" id="me">
+				<ul>
+					<li id="teamallTeams">
+						I love all teams
+					</li>
+				</ul>
+				<ul data-bind="teams">
+					<li data-bind="teamInList"></li>
+				</ul>
+			</section>
+			
 		</article>
 		
 		<!-- Libs -->
@@ -132,8 +144,8 @@
 		
 		<!-- jQuery -->
 		<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
-		<script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
-		<script src="js/libs/jquery.flip.min.js"></script>
+		<!-- script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script -->
+		<script src="js/libs/jquery.flippy.min.js"></script>
 		
 		<!-- Application -->
 		<script src="js/frisbee.js"></script>
