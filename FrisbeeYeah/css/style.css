@@ -348,7 +348,7 @@ article > section.active {
 
 .theResults.shown {
     padding:0 0 1.5em;
-    max-height:40em;
+    max-height:100em;
 }
 
 .theResults td {

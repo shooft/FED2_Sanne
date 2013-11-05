@@ -165,7 +165,7 @@ var FRISBEE = FRISBEE || {};
         		self.swithGameMode(e.currentTarget.id, e.type);
     		});
 			// unbind leftover events from buttons
-			$( "#"+gameID+" .theScore .teamName" ).off();
+			$( "#"+gameID+" .theScore .teamName div" ).off();
 		},
 		
 		swithGameMode: function(gameID, eventType){
