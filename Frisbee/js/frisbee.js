@@ -53,6 +53,7 @@ var FRISBEE = FRISBEE || {};
 	
 	// Page
 	FRISBEE.page = {
+		// Pagina specifieke code in het page object zetten
 		render: function (route) {
 			// data ophalen
 			var data = eval('FRISBEE.'+route);
